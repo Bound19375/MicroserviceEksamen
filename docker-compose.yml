@@ -1,0 +1,30 @@
+version: '3.4'
+
+services:
+  apigateway:
+    image: ${DOCKER_REGISTRY-}apigateway #boundsoul19375/whatever:latest
+    networks: 
+      - private_network
+    hostname: api.gateway
+    restart: always
+    environment:
+      #- ASPNETCORE_URLS=https://+:443;http://+:80
+      #- ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=Timelost19375
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/certs/oerumtechorigin.pfx
+    ports:
+      #- '80:80'
+      - '443:443' 
+    build:
+      context: .
+      dockerfile: API.Gateway/Dockerfile
+    volumes:
+      - ./Certs/:/app/certs/
+      #- /home/bound/certs/:/app/certs/
+
+networks:
+  private_network:
+   driver: bridge
+
+volumes:
+  persistedData:
