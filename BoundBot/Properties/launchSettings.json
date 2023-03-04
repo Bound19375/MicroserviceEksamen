@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "BoundBot": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

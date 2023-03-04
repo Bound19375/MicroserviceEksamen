@@ -12,21 +12,22 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:latest AS build
 WORKDIR /src
-COPY ["ApiGateway/ApiGateway.csproj", "ApiGateway/"]
-RUN dotnet restore "ApiGateway/ApiGateway.csproj"
+COPY ["BoundBot/BoundBot.csproj", "BoundBot/"]
+COPY ["Crosscut/Crosscut.csproj", "Crosscut/"]
+RUN dotnet restore "BoundBot/BoundBot.csproj"
 COPY . .
-WORKDIR "/src/ApiGateway"
-RUN dotnet build "ApiGateway.csproj" -c Release -o /app/build
+WORKDIR "/src/BoundBot"
+RUN dotnet build "BoundBot.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "ApiGateway.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "BoundBot.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-FROM win AS basewin
+FROM win AS finalWin
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "ApiGateway.dll"]
+ENTRYPOINT ["dotnet", "BoundBot.dll"]
 
-FROM arm AS basearm
+FROM arm AS finalArm
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "ApiGateway.dll"]
+ENTRYPOINT ["dotnet", "BoundBot.dll"]
