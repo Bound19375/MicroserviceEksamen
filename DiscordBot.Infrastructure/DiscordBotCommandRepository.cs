@@ -1,7 +1,5 @@
 ﻿using Auth.Database;
 using Auth.Database.Model;
-using Crosscut;
-using Crosscut.DiscordConnectionHandler.DiscordClientLibrary;
 using Discord;
 using Discord.Rest;
 using Discord.WebSocket;
@@ -143,7 +141,7 @@ namespace DiscordBot.Infrastructure
                         if (guildUser != null)
                         {
                             ulong roleId = (ulong)(item.ProductNameEnum == WhichSpec.AIO ? 986361482377826334 : 911959454323445840);
-                            var role = guild.GetRole(roleId);
+                            var role = guild!.GetRole(roleId);
                             await guildUser.AddRoleAsync(role);
                         }
 
@@ -154,7 +152,7 @@ namespace DiscordBot.Infrastructure
                     {
                         if (guildUser != null)
                         {
-                            var role = guild.GetRole(911959454323445840);
+                            var role = guild!.GetRole(911959454323445840);
                             await guildUser.AddRoleAsync(role);
                         }
                     }

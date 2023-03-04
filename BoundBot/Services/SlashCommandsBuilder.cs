@@ -12,18 +12,18 @@ namespace BoundBot.Services
 {
     internal class SlashCommandsBuilder
     {
-        private DiscordSocketClient client { get; set; }
+        private DiscordSocketClient Client { get; set; }
 
 
-        public SlashCommandsBuilder(DiscordSocketClient _client)
+        public SlashCommandsBuilder(DiscordSocketClient client)
         {
-            client = _client;
+            Client = client;
         }
 
         public async Task Client_Ready()
         {
             // Let's build a guild command! We're going to need a guild so lets just put that in a variable.
-            var guild = client.GetGuild(860603152280584222);
+            var guild = Client.GetGuild(860603152280584222);
 
             // Next, lets create our slash command builder. This is like the embed builder but for slash commands.
 
@@ -71,7 +71,7 @@ namespace BoundBot.Services
 
             try
             {
-                await client.BulkOverwriteGlobalApplicationCommandsAsync(commands.ToArray());
+                await Client.BulkOverwriteGlobalApplicationCommandsAsync(commands.ToArray());
                
                 /*
                 foreach (var ele in commands)

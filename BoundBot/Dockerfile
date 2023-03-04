@@ -13,7 +13,7 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:latest AS build
 WORKDIR /src
 COPY ["BoundBot/BoundBot.csproj", "BoundBot/"]
-COPY ["Crosscut/Crosscut.csproj", "Crosscut/"]
+COPY ["Crosscutting/Crosscutting.csproj", "Crosscutting/"]
 RUN dotnet restore "BoundBot/BoundBot.csproj"
 COPY . .
 WORKDIR "/src/BoundBot"

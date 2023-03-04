@@ -20,4 +20,8 @@
     <Folder Include="Controllers\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Crosscutting\Crosscutting.csproj" />
+  </ItemGroup>
+
 </Project>

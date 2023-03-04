@@ -1,8 +1,6 @@
-﻿using Crosscut;
-using Crosscutting;
+﻿using Crosscutting;
 using DiscordBot.Application.Interface;
 using Microsoft.AspNetCore.Mvc;
-using Quartz;
 
 namespace API.DiscordBot.Controllers
 {

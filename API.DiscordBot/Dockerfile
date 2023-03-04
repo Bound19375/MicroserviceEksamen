@@ -14,11 +14,10 @@ FROM mcr.microsoft.com/dotnet/sdk:latest AS build
 WORKDIR /src
 COPY ["API.DiscordBot/API.DiscordBot.csproj", "API.DiscordBot/"]
 COPY ["Auth.Database/Auth.Database.csproj", "Auth.Database/"]
-COPY ["Crosscut/Crosscut.csproj", "Crosscut/"]
+COPY ["Crosscutting/Crosscutting.csproj", "Crosscutting/"]
 COPY ["DiscordBot.Infrastructure/DiscordBot.Infrastructure.csproj", "DiscordBot.Infrastructure/"]
 COPY ["BoundBot/BoundBot.csproj", "BoundBot/"]
 COPY ["DiscordBot.Application/DiscordBot.Application.csproj", "DiscordBot.Application/"]
-COPY ["Identity.Database/Identity.Database.csproj", "Identity.Database/"]
 RUN dotnet restore "API.DiscordBot/API.DiscordBot.csproj"
 COPY . .
 WORKDIR "/src/API.DiscordBot"

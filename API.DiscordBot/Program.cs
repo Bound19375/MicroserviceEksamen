@@ -1,18 +1,11 @@
-using System.Drawing.Text;
 using API.DiscordBot.HostService;
 using Auth.Database;
 using Crosscutting.TransactionHandling;
 using DiscordBot.Application.Implementation;
 using DiscordBot.Application.Interface;
 using DiscordBot.Infrastructure;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyModel;
-using Microsoft.Extensions.Hosting;
 using Quartz;
-using Quartz.Impl;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -98,6 +91,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
-
-

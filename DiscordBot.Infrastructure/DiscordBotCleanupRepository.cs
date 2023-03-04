@@ -1,14 +1,11 @@
 ﻿using Auth.Database;
-using Crosscut.DiscordConnectionHandler.DiscordClientLibrary;
 using Discord;
 using Discord.WebSocket;
 using DiscordBot.Application.Interface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Quartz;
-using System.Data;
-using System.Linq;
+using Crosscutting.DiscordConnectionHandler.DiscordClientLibrary;
 using Crosscutting.TransactionHandling;
 
 namespace DiscordBot.Infrastructure;

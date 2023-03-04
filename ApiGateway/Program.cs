@@ -5,6 +5,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+//Docker
+builder.Configuration.AddEnvironmentVariables();
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -18,7 +21,7 @@ builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
 //TLS
-var certificate = new X509Certificate2(builder.Configuration["Kestrel:Certificates:Default:Path"], builder.Configuration["Kestrel:Certificates:Default:Password"]);
+var certificate = new X509Certificate2(builder.Configuration["Kestrel:Certificates:Default:Path"]!, builder.Configuration["Kestrel:Certificates:Default:Password"]);
 builder.WebHost.UseKestrel(options => {
     options.Listen(IPAddress.Any, 80, listenOptions => {
         listenOptions.UseConnectionLogging();

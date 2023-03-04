@@ -14,10 +14,9 @@ FROM mcr.microsoft.com/dotnet/sdk:latest AS build
 WORKDIR /src
 COPY ["API.Auth/API.Auth.csproj", "API.Auth/"]
 COPY ["Auth.Application/Auth.Application.csproj", "Auth.Application/"]
-COPY ["Crosscut/Crosscut.csproj", "Crosscut/"]
+COPY ["Crosscutting/Crosscutting.csproj", "Crosscutting/"]
 COPY ["Auth.Database/Auth.Database.csproj", "Auth.Database/"]
 COPY ["Auth.Infrastructure/Auth.Infrastructure.csproj", "Auth.Infrastructure/"]
-COPY ["Identity.Database/Identity.Database.csproj", "Identity.Database/"]
 RUN dotnet restore "API.Auth/API.Auth.csproj"
 COPY . .
 WORKDIR "/src/API.Auth"

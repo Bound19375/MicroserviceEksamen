@@ -1,11 +1,9 @@
-﻿using System.Configuration;
-using Auth.Database;
+﻿using Auth.Database;
 using Auth.Database.Model;
 using Crosscutting;
 using Discord;
 using DiscordBot.Application.Interface;
 using Microsoft.Extensions.Logging;
-using DiscordBot;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Crosscutting.DiscordConnectionHandler.DiscordClientLibrary;
@@ -124,7 +122,7 @@ namespace DiscordBot.Infrastructure
                         UserId = dbUserId,
                         UniqId = root.Data.Uniqid,
                         ProductName = root.Data.ProductTitle,
-                        ProductPrice = root.Data.TotalDisplay.ToString(),
+                        ProductPrice = root.Data.TotalDisplay.ToString() ?? "null",
                         PurchaseDate = DateTime.Now,
                     };
 
@@ -147,7 +145,7 @@ namespace DiscordBot.Infrastructure
 
                     if (clientUser != null)
                     {
-                        var guild = _client.GetGuild(ulong.Parse(_configuration["Discord:Guid"]));
+                        var guild = _client.GetGuild(ulong.Parse(_configuration["Discord:Guid"]!));
                         IGuildUser? guildUser = null;
                         if (guild != null)
                         {

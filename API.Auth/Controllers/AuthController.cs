@@ -1,6 +1,4 @@
 ﻿using Auth.Application.Interface;
-using Crosscut;
-using Discord;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;

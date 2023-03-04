@@ -9,19 +9,16 @@ services:
     hostname: api.gateway
     restart: always
     environment:
-      #- ASPNETCORE_URLS=https://+:443;http://+:80
-      #- ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=Timelost19375
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/certs/oerumtechorigin.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${ASPNETCORE_Kestrel__Certificates__Default__Password}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_Kestrel__Certificates__Default__Path}
     ports:
-      #- '80:80'
       - '443:443' 
     build:
       context: .
       dockerfile: apigateway/Dockerfile
     volumes:
+      - persistedData:/app/certs/
       - ./Crosscutting/certs/:/app/certs/
-      #- /home/bound/certs/:/app/certs/
 
   boundbot:
     image: ${DOCKER_REGISTRY-}boundbot
@@ -30,8 +27,7 @@ services:
       - private_network
     hostname: boundbotinfrastructure.oerumtechnologies.com
     environment:
-      - ConnectionStrings__BoundcoreIdentity=server=OTnoprox.oerumtechnologies.com;port=19372;database=Boundcore.Identity;user=boundcore;password=19375Boundcore19375;AllowPublicKeyRetrieval=True;SslMode=preferred;
-      - ConnectionStrings__BoundcoreMaster=server=OTnoprox.oerumtechnologies.com;port=19372;database=Boundcore.Master;user=boundcore;password=19375Boundcore19375;AllowPublicKeyRetrieval=True;SslMode=preferred;
+      - ConnectionStrings__BoundcoreMaster=${ConnectionStrings__BoundcoreMaster}
     restart: always
     build:
       context: .
@@ -44,8 +40,7 @@ services:
       - private_network
     hostname: api.auth.oerumtechnologies.com
     environment:
-      - ConnectionStrings__BoundcoreIdentity=server=OTnoprox.oerumtechnologies.com;port=19372;database=Boundcore.Identity;user=boundcore;password=19375Boundcore19375;AllowPublicKeyRetrieval=True;SslMode=preferred;
-      - ConnectionStrings__BoundcoreMaster=server=OTnoprox.oerumtechnologies.com;port=19372;database=Boundcore.Master;user=boundcore;password=19375Boundcore19375;AllowPublicKeyRetrieval=True;SslMode=preferred;
+      - ConnectionStrings__BoundcoreMaster=${ConnectionStrings__BoundcoreMaster}
     restart: always
     build:
       context: .
@@ -53,20 +48,17 @@ services:
       
   api.discordbot:
     image: ${DOCKER_REGISTRY-}apidiscordbot
-    platform: linux/arm64/v8
+    #platform: linux/arm64/v8
     networks: 
       - private_network
     hostname: api.discordbot.oerumtechnologies.com
     environment:
-      - ConnectionStrings__BoundcoreIdentity=server=OTnoprox.oerumtechnologies.com;port=19372;database=Boundcore.Identity;user=boundcore;password=19375Boundcore19375;AllowPublicKeyRetrieval=True;SslMode=preferred;
-      - ConnectionStrings__BoundcoreMaster=server=OTnoprox.oerumtechnologies.com;port=19372;database=Boundcore.Master;user=boundcore;password=19375Boundcore19375;AllowPublicKeyRetrieval=True;SslMode=preferred;
+      - ConnectionStrings__BoundcoreMaster=${ConnectionStrings__BoundcoreMaster}
     restart: always
     build:
       context: .
       dockerfile: API.DiscordBot/Dockerfile
 
-
-  ########
   rabbitMQ:
     image:  masstransit/rabbitmq:latest
     #platform: linux/arm64/v8
@@ -76,26 +68,28 @@ services:
     hostname: rabbitMQ
     restart: always
     environment:
-      - RABBITMQ_DEFAULT_USER=rabbitmquser
-      - RABBITMQ_DEFAULT_PASS=rabbitmquser
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
     ports:
-        - 5672:5672
-        - 15672:15672
+      - 5672:5672
+      - 15672:15672
     volumes:
-        - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
-        - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
-        - persistedData:/var/lib/rabbitmq/
-        - persistedData:/var/log/rabbitmq
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+      - persistedData:/var/lib/rabbitmq/
+      - persistedData:/var/log/rabbitmq
 
-  db:
+  mariaDB:
     image: mariadb:latest
     #platform: linux/arm64/v8
+    env_file:
+     - .env
     container_name: mariadb
     environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: mydatabase
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
+      ACCEPT_EULA: Y
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - persistedData:/var/lib/mysql
     ports:
@@ -107,6 +101,5 @@ networks:
 
 volumes:
   persistedData:
-
 
 

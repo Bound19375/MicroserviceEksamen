@@ -1,10 +1,7 @@
 ﻿using Auth.Database;
-using Auth.Database.Model;
-using Crosscut;
 using Crosscutting;
 using DiscordBot.Application.Interface;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Infrastructure

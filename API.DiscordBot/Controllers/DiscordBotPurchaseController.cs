@@ -24,7 +24,7 @@ namespace API.DiscordBot.Controllers
             try
             {
                 string? jsonString = json.ToString() ?? throw new Exception("JsonObject Is Invalid!");
-                SellixPayloadNormal.Root data = JsonConvert.DeserializeObject<SellixPayloadNormal.Root>(jsonString);
+                SellixPayloadNormal.Root data = JsonConvert.DeserializeObject<SellixPayloadNormal.Root>(jsonString) ?? throw new Exception("Invalid Json Object");
                 await _handler.WebShopGrantWallet(data);
                 return Ok();
             }

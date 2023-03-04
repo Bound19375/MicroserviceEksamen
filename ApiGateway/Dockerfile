@@ -13,6 +13,7 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:latest AS build
 WORKDIR /src
 COPY ["ApiGateway/ApiGateway.csproj", "ApiGateway/"]
+COPY ["Crosscutting/Crosscutting.csproj", "Crosscutting/"]
 RUN dotnet restore "ApiGateway/ApiGateway.csproj"
 COPY . .
 WORKDIR "/src/ApiGateway"
@@ -21,12 +22,12 @@ RUN dotnet build "ApiGateway.csproj" -c Release -o /app/build
 FROM build AS publish
 RUN dotnet publish "ApiGateway.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-FROM win AS basewin
+FROM base AS finalWin
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "ApiGateway.dll"]
 
-FROM arm AS basearm
+FROM base AS finalArm
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "ApiGateway.dll"]

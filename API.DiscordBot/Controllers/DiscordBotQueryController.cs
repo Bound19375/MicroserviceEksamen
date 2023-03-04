@@ -1,7 +1,4 @@
-﻿using Crosscut;
-using Discord;
-using Discord.WebSocket;
-using DiscordBot.Application.Interface;
+﻿using DiscordBot.Application.Interface;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.DiscordBot.Controllers

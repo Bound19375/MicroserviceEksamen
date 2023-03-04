@@ -1,22 +1,34 @@
-﻿using System.Configuration;
-using BoundBot.Services;
-using Crosscut.DiscordConnectionHandler.DiscordClientLibrary;
+﻿using BoundBot.Services;
+using Crosscutting.DiscordConnectionHandler.DiscordClientLibrary;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 
 namespace BoundBot;
 
 public class DiscordBot
 {
-    static DiscordSocketClient Client = DiscordClient.GetDiscordSocketClient();
-    static CommandService Service = DiscordClient.GetCommandService();
+    static readonly DiscordSocketClient Client = DiscordClient.GetDiscordSocketClient();
+    static readonly CommandService Service = DiscordClient.GetCommandService();
 
     public static Task Main(string[] args) => new DiscordBot().MainAsync();
 
     async Task MainAsync()
     {
+        var configBuilder = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+            .AddEnvironmentVariables()
+            .Build();
+
+        var service = new ServiceCollection()
+            .AddScoped(sp => new HttpClient {
+                BaseAddress = new Uri(configBuilder["HttpClient:connStr"] ?? string.Empty)
+            });
+        service.BuildServiceProvider();
+
         Client.Log += Log;
 
         CommandHandler cHandler = new(Client, Service);
@@ -24,7 +36,7 @@ public class DiscordBot
         
         SlashCommandsBuilder builder = new(Client);
         Client.Ready += builder.Client_Ready;
-        SlashCommandsHandler sHandler = new(Client);
+        SlashCommandsHandler sHandler = new(Client, configBuilder);
         Client.SlashCommandExecuted += sHandler.SlashCommandHandler;
 
         // Block this task until the program is closed.

@@ -7,7 +7,7 @@ namespace Crosscutting.TransactionHandling
     public class UnitOfWork<T> : IUnitOfWork<T> where T : DbContext
     {
         private readonly T _context;
-        private IDbContextTransaction _transaction;
+        private IDbContextTransaction _transaction = null!;
 
         public UnitOfWork(T context)
         {
@@ -17,7 +17,7 @@ namespace Crosscutting.TransactionHandling
         {
             try 
             {
-                _transaction = _context.Database.CurrentTransaction ?? await _context.Database.BeginTransactionAsync(isolationLevel);
+                _transaction = _context.Database.CurrentTransaction ?? await _context.Database.BeginTransactionAsync();
             }
             catch (Exception exception) {
                 throw new Exception(exception.ToString());
