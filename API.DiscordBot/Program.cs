@@ -1,10 +1,14 @@
+using System.Text;
 using API.DiscordBot.HostService;
 using Auth.Database;
 using Crosscutting.TransactionHandling;
 using DiscordBot.Application.Implementation;
 using DiscordBot.Application.Interface;
 using DiscordBot.Infrastructure;
+using MassTransit;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,7 +33,6 @@ builder.Services.AddDbContext<AuthDbContext>(options =>
         });
 });
 
-
 //Dependency Injection
 builder.Services.Scan(a => a.FromCallingAssembly().AddClasses().AsMatchingInterface().WithScopedLifetime());
 //builder.Services.AddScoped<IUnitOfWork<IdentityDb>, UnitOfWork<IdentityDb>>();
@@ -48,9 +51,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//Quartz
 builder.Services.AddQuartz(q =>
 {
-    var jobKey = new JobKey("MyJob");
+    var jobKey = new JobKey("Purge");
     q.AddJob<HostService>(opts => 
     {
         opts.WithIdentity(jobKey);
@@ -73,6 +77,40 @@ builder.Services.AddQuartz(q =>
 builder.Services.AddQuartzHostedService(opt =>
 {
     opt.WaitForJobsToComplete = true;
+});
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
+            ValidAudience = builder.Configuration["JWT:ValidAudience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"]!))
+        };
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("hwid", policy => policy.RequireClaim("hwid"));
+});
+
+//MassTransitRabbitMQ
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("rabbitMQ", "/", h =>
+        {
+            h.Username(builder.Configuration["RabbitMQ:User"]);
+            h.Password(builder.Configuration["RabbitMQ:Pass"]);
+        });
+        cfg.ConfigureEndpoints(context);
+    });
 });
 
 var app = builder.Build();

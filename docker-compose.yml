@@ -28,6 +28,14 @@ services:
     hostname: boundbotinfrastructure.oerumtechnologies.com
     environment:
       - ConnectionStrings__BoundcoreMaster=${ConnectionStrings__BoundcoreMaster}
+      - JWT__ValidIssuer=${JWTValidUssuer}
+      - JWT__ValidAudience${JWTValidAudience}
+      - JWT__SecretKey=${JWTSecretKey}
+      - RabbitMQ__User=${RabbitMQUser} 
+      - RabbitMQ__Pass=${rabbitmqpass}
+      - HttpClient__connStr=${DiscordbotHttpClientconnStr}
+      - Discord__Token=${DiscordToken}
+      - Discord__Guid=${DiscordGuid} 
     restart: always
     build:
       context: .
@@ -41,6 +49,13 @@ services:
     hostname: api.auth.oerumtechnologies.com
     environment:
       - ConnectionStrings__BoundcoreMaster=${ConnectionStrings__BoundcoreMaster}
+      - JWT__ValidIssuer=${JWTValidUssuer}
+      - JWT__ValidAudience${JWTValidAudience}
+      - JWT__SecretKey=${JWTSecretKey}
+      - RabbitMQ__User=${rabbitmquser} 
+      - RabbitMQ__Pass=${rabbitmqpass}
+      - Discord__Token=${DiscordToken}
+      - Discord__Guid=${DiscordGuid} 
     restart: always
     build:
       context: .
@@ -54,6 +69,13 @@ services:
     hostname: api.discordbot.oerumtechnologies.com
     environment:
       - ConnectionStrings__BoundcoreMaster=${ConnectionStrings__BoundcoreMaster}
+      - JWT__ValidIssuer=${JWTValidUssuer}
+      - JWT__ValidAudience${JWTValidAudience}
+      - JWT__SecretKey=${JWTSecretKey}
+      - RabbitMQ__User=${rabbitmquser} 
+      - RabbitMQ__Pass=${rabbitmqpass}
+      - Discord__Token=${DiscordToken}
+      - Discord__Guid=${DiscordGuid} 
     restart: always
     build:
       context: .
@@ -74,10 +96,10 @@ services:
       - 5672:5672
       - 15672:15672
     volumes:
-      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
-      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
       - persistedData:/var/lib/rabbitmq/
       - persistedData:/var/log/rabbitmq
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
 
   mariaDB:
     image: mariadb:latest

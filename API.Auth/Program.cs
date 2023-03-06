@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Crosscutting.TransactionHandling;
+using MassTransit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,6 +62,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("hwid", policy => policy.RequireClaim("hwid"));
+});
+
+//MassTransitRabbitMQ
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("rabbitMQ", "/", h =>
+        {
+            h.Username(builder.Configuration["RabbitMQ:User"]);
+            h.Password(builder.Configuration["RabbitMQ:Pass"]);
+        });
+        cfg.ConfigureEndpoints(context);
+    });
 });
 
 var app = builder.Build();

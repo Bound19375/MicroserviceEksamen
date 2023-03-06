@@ -12,8 +12,8 @@ namespace BoundBot.Services
 {
     internal class SlashCommandsHandler
     {
-        private DiscordSocketClient Client { get; set; }
-        private IConfiguration Configuration { get; set; }
+        private DiscordSocketClient Client { get; }
+        private IConfiguration Configuration { get; }
 
         public SlashCommandsHandler(DiscordSocketClient client, IConfiguration configuration)
         {
@@ -23,19 +23,19 @@ namespace BoundBot.Services
 
         internal class RestModel
         {
-            public DiscordModelDTO model { get; set; } = new DiscordModelDTO();
+            public DiscordModelDTO Model { get; set; } = new DiscordModelDTO();
 
             public RestModel(SocketSlashCommand command)
             {
                 var guilduser = (SocketGuildUser)command.User;
 
-                model.DiscordUsername = guilduser.Username + "#" + guilduser.Discriminator;
-                model.DiscordId = guilduser.Id.ToString();
-                model.Channel = command.Channel.Id.ToString();
-                model.Command = command.CommandName;
+                Model.DiscordUsername = guilduser.Username + "#" + guilduser.Discriminator;
+                Model.DiscordId = guilduser.Id.ToString();
+                Model.Channel = command.Channel.Id.ToString();
+                Model.Command = command.CommandName;
                 
                 var roles = guilduser.Roles.Select(role => role.ToString()).ToList();
-                model.Roles = roles.Count == 0 ? new List<string>() { "0000000000" } : roles;
+                Model.Roles = roles.Count == 0 ? new List<string>() { "0000000000" } : roles;
             }
         }
         
@@ -99,7 +99,7 @@ namespace BoundBot.Services
                 else
                 {
                     Console.Write("Roles: ");
-                    foreach (var role in restModel.model.Roles!)
+                    foreach (var role in restModel.Model.Roles!)
                     {
                         Console.Write(role + ", ");
                     }
@@ -135,7 +135,7 @@ namespace BoundBot.Services
                     else
                     {
                         Console.Write("Roles: ");
-                        foreach (var role in restModel.model.Roles!)
+                        foreach (var role in restModel.Model.Roles!)
                         {
                             Console.Write(role + ", ");
                         }
@@ -147,8 +147,8 @@ namespace BoundBot.Services
 
                 embedBuiler.AddField("Purchase",
                     "Please use the following information I've collected for you upon your purchase!" +
-                    $"\r\n\r\nYour Discord Name Is: `{restModel.model.DiscordUsername}`" +
-                    $"\r\nYour Discord ID Is: `{restModel.model.DiscordId}`" +
+                    $"\r\n\r\nYour Discord Name Is: `{restModel.Model.DiscordUsername}`" +
+                    $"\r\nYour Discord ID Is: `{restModel.Model.DiscordId}`" +
                     "\r\nYour A# HWID Is: Check A# Console." +
                     "\r\n\r\nIf you're a server booster contact @Bound for your coupon for 10%." +
                     "\r\n\r\nThank you for your interest & support in what I do! <:peepolove:1002285157132271746>");
@@ -174,7 +174,7 @@ namespace BoundBot.Services
                 var embedBuilder = new EmbedBuilder();
                 embedBuilder.ThumbnailUrl = "https://i.imgur.com/dxCVy9r.png";
 
-                HttpResponseMessage resp = await client.PutAsJsonAsync(Configuration["HttpClient:connStr"] + "/gateway/API/DiscordBot/Command/UpdateDiscord", restModel.model);
+                HttpResponseMessage resp = await client.PutAsJsonAsync(Configuration["HttpClient:connStr"] + "/gateway/API/DiscordBot/Command/UpdateDiscord", restModel.Model);
                 var ResponseBody = await resp.Content.ReadAsStringAsync();
                 if (resp.IsSuccessStatusCode)
                 {
@@ -208,9 +208,9 @@ namespace BoundBot.Services
                 var embedBuilder = new EmbedBuilder();
                 embedBuilder.ThumbnailUrl = "https://i.imgur.com/dxCVy9r.png";
 
-                restModel.model.HWID = (command.Data.Options.First().Value as string)!;
+                restModel.Model.HWID = (command.Data.Options.First().Value as string)!;
 
-                HttpResponseMessage resp = await client.PutAsJsonAsync(Configuration["HttpClient:connStr"] + "/gateway/API/DiscordBot/Command/UpdateHwid", restModel.model);
+                HttpResponseMessage resp = await client.PutAsJsonAsync(Configuration["HttpClient:connStr"] + "/gateway/API/DiscordBot/Command/UpdateHwid", restModel.Model);
                 var responseBody = await resp.Content.ReadAsStringAsync();
                 if (resp.IsSuccessStatusCode)
                 {
@@ -293,8 +293,8 @@ namespace BoundBot.Services
                 embedBuilder.ThumbnailUrl = "https://i.imgur.com/dxCVy9r.png";
 
 
-                if (restModel.model.Roles!.Contains("860603777790771211") || restModel.model.Roles.Contains("860628656259203092")
-                    || restModel.model.Roles.Contains("Mod") || restModel.model.Roles.Contains("Staff"))
+                if (restModel.Model.Roles!.Contains("860603777790771211") || restModel.Model.Roles.Contains("860628656259203092")
+                    || restModel.Model.Roles.Contains("Mod") || restModel.Model.Roles.Contains("Staff"))
                 {
                     var client = new HttpClient();
 
@@ -353,14 +353,14 @@ namespace BoundBot.Services
                 var embedBuilder = new EmbedBuilder();
                 embedBuilder.ThumbnailUrl = "https://i.imgur.com/dxCVy9r.png";
 
-                if (restModel.model.Roles!.Contains("860603777790771211") || restModel.model.Roles.Contains("860628656259203092")
-                    || restModel.model.Roles.Contains("Mod") || restModel.model.Roles.Contains("Staff"))
+                if (restModel.Model.Roles!.Contains("860603777790771211") || restModel.Model.Roles.Contains("860628656259203092")
+                    || restModel.Model.Roles.Contains("Mod") || restModel.Model.Roles.Contains("Staff"))
                 {
-                    restModel.model.HWID = (command.Data.Options.First().Value as string)!;
+                    restModel.Model.HWID = (command.Data.Options.First().Value as string)!;
 
                     var client = new HttpClient();
 
-                    HttpResponseMessage resp = await client.PostAsJsonAsync(Configuration["HttpClient:connStr"] + $"/gateway/API/DiscordBot/Command/StaffLicense", restModel.model);
+                    HttpResponseMessage resp = await client.PostAsJsonAsync(Configuration["HttpClient:connStr"] + $"/gateway/API/DiscordBot/Command/StaffLicense", restModel.Model);
                     var responseBody = await resp.Content.ReadAsStringAsync();
                     if (resp.IsSuccessStatusCode)
                     {

@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.14-develop.1108" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Crosscutting\Crosscutting.csproj" />
   </ItemGroup>
 
