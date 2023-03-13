@@ -7,7 +7,9 @@
         "apigateway": "StartDebugging",
         "api.auth": "StartDebugging",
         "api.discordbot": "StartDebugging",
-        "boundbot": "StartDebugging"
+        "boundbot": "StartDebugging",
+        "kafkabroker": "StartDebugging",
+        "dbcleanupservice": "StartDebugging"
       }
     }
   }

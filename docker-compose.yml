@@ -81,25 +81,87 @@ services:
       context: .
       dockerfile: API.DiscordBot/Dockerfile
 
-  rabbitMQ:
-    image:  masstransit/rabbitmq:latest
+  dbcleanupservice:
+    image: ${DOCKER_REGISTRY-}dbcleanupservice
     #platform: linux/arm64/v8
-    container_name: rabbitMQ
-    networks:
+    networks: 
       - private_network
-    hostname: rabbitMQ
-    restart: always
     environment:
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+      - ConnectionStrings__BoundcoreMaster=${ConnectionStrings__BoundcoreMaster}
+    build:
+      context: .
+      dockerfile: DbCleanupService/Dockerfile
+    
+#####################################################################################
+############################  External Docker Services  #############################
+#####################################################################################
+
+  kafkabroker:
+    image: ${DOCKER_REGISTRY-}kafkabroker
+    #platform: linux/arm64/v8
+    networks: 
+      - private_network
+    build:
+      context: .
+      dockerfile: KafkaBroker/Dockerfile
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    #platform: linux/arm64/v8
+    networks: 
+      - private_network
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  broker:
+    image: confluentinc/cp-kafka:latest
+    #platform: linux/arm64/v8
+    networks: 
+      - private_network
+    container_name: broker
     ports:
-      - 5672:5672
-      - 15672:15672
-    volumes:
-      - persistedData:/var/lib/rabbitmq/
-      - persistedData:/var/log/rabbitmq
-      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
-      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
+  kafka-control-center:
+    image: confluentinc/cp-enterprise-control-center
+    #platform: linux/arm64/v8
+    ports:
+     - 9021:9021 
+    environment:
+      CONTROL_CENTER_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      CONTROL_CENTER_BOOTSTRAP_SERVERS: 'kafka:9092'
+
+  #rabbitMQ:
+  #  image:  masstransit/rabbitmq:latest
+  #  #platform: linux/arm64/v8
+  #  container_name: rabbitMQ
+  #  networks:
+  #    - private_network
+  #  hostname: rabbitMQ
+  #  restart: always
+  #  environment:
+  #    - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+  #    - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+  #  ports:
+  #    - 5672:5672
+  #    - 15672:15672
+  #  volumes:
+  #    - persistedData:/var/lib/rabbitmq/
+  #    - persistedData:/var/log/rabbitmq
+  #    - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+  #    - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
 
   mariaDB:
     image: mariadb:latest
@@ -123,5 +185,7 @@ networks:
 
 volumes:
   persistedData:
+
+
 
 

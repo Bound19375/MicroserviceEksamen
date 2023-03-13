@@ -1,15 +1,12 @@
 using System.Text;
-using API.DiscordBot.HostService;
 using Auth.Database;
 using Crosscutting.TransactionHandling;
 using DiscordBot.Application.Implementation;
 using DiscordBot.Application.Interface;
 using DiscordBot.Infrastructure;
-using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,34 +48,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//Quartz
-builder.Services.AddQuartz(q =>
-{
-    var jobKey = new JobKey("Purge");
-    q.AddJob<HostService>(opts => 
-    {
-        opts.WithIdentity(jobKey);
-    });
-
-    q.AddTrigger(opts =>
-    {
-        opts.ForJob(jobKey);
-        opts.WithIdentity("MyJob-Trigger");
-        opts.WithCronSchedule("0 0 0 ? * * *");
-        //opts.WithSimpleSchedule(x=> {
-        //    x.WithIntervalInSeconds(1);
-        //    x.WithRepeatCount(0);
-        //});
-    });
-
-    q.UseMicrosoftDependencyInjectionJobFactory();
-});
-
-builder.Services.AddQuartzHostedService(opt =>
-{
-    opt.WaitForJobsToComplete = true;
-});
-
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -97,20 +66,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("hwid", policy => policy.RequireClaim("hwid"));
-});
-
-//MassTransitRabbitMQ
-builder.Services.AddMassTransit(x =>
-{
-    x.UsingRabbitMq((context, cfg) =>
-    {
-        cfg.Host("rabbitMQ", "/", h =>
-        {
-            h.Username(builder.Configuration["RabbitMQ:User"]);
-            h.Password(builder.Configuration["RabbitMQ:Pass"]);
-        });
-        cfg.ConfigureEndpoints(context);
-    });
 });
 
 var app = builder.Build();

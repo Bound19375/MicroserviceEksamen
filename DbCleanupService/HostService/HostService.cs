@@ -1,7 +1,7 @@
 ﻿using DiscordBot.Application.Interface;
 using Quartz;
 
-namespace API.DiscordBot.HostService
+namespace DbCleanupService.HostService
 {
     [DisallowConcurrentExecution]
     public class HostService : IJob
