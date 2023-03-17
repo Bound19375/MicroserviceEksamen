@@ -1,4 +1,5 @@
 ﻿using DiscordBot.Application.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.DiscordBot.Controllers
@@ -12,6 +13,9 @@ namespace API.DiscordBot.Controllers
             _discord = discord;
         }
 
+        [HttpPost("Authenticate")]
+        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "staff")]
         [HttpGet("CheckDB/{username}/{id}")]
         public async Task<IActionResult> CheckDB(string username, string id)
         {
@@ -26,6 +30,8 @@ namespace API.DiscordBot.Controllers
             }
         }
 
+        [HttpPost("Authenticate")]
+        [Authorize(Roles = "User")]
         [HttpGet("CheckMe/{username}/{id}")]
         public async Task<IActionResult> CheckMe(string username, string id)
         {

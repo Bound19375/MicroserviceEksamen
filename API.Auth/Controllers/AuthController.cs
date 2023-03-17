@@ -6,6 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Crosscutting;
+using MassTransit.NewIdProviders;
 
 namespace API.Auth.Controllers
 {
@@ -21,16 +22,20 @@ namespace API.Auth.Controllers
             _configuration = configuration;
         }
 
-        [HttpGet("JwtGenerate/{hwid}")]
+        public class JWTModel
+        {
+            public string Hwid { get; set; }
+        }
+
+        [HttpPost("JwtGenerate")]
         [AllowAnonymous]
-        public async Task<IActionResult> Generate(string hwid)
+        public async Task<IActionResult> Generate([FromBody] JWTModel body)
         {
             var claims = new List<Claim>
             {
-                new Claim("hwid", hwid),
+                new Claim("hwid", body.Hwid),
                 new Claim("role", "User"),
             };
-
 
             var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:SecretKey"]!));
             var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256Signature);

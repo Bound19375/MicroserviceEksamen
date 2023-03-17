@@ -7,6 +7,7 @@ using Discord;
 using Newtonsoft.Json;
 using Discord.Rest;
 using Microsoft.Extensions.Configuration;
+using System.Net.Http.Headers;
 
 namespace BoundBot.Services
 {
@@ -14,11 +15,14 @@ namespace BoundBot.Services
     {
         private DiscordSocketClient Client { get; }
         private IConfiguration Configuration { get; }
+        private readonly HttpClient _httpClient;
 
-        public SlashCommandsHandler(DiscordSocketClient client, IConfiguration configuration)
+
+        public SlashCommandsHandler(DiscordSocketClient client, IConfiguration configuration, IHttpClientFactory httpClientFactory)
         {
             Client = client;
             Configuration = configuration;
+            _httpClient = httpClientFactory.CreateClient("httpClient");
         }
 
         internal class RestModel
@@ -167,24 +171,30 @@ namespace BoundBot.Services
         {
             try
             {
-                var client = new HttpClient();
+                var client = _httpClient;
 
                 RestModel restModel = new(command);
 
+                HttpResponseMessage jwtResponseMessage = await client.PostAsJsonAsync($"/gateway/API/DiscordBot/JwtGenerate", restModel.Model);
+                var jwtResponseBody = await jwtResponseMessage.Content.ReadAsStringAsync();
+
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtResponseBody);
+
+                HttpResponseMessage resp = await client.PutAsJsonAsync("/gateway/API/DiscordBot/Command/UpdateDiscord", restModel.Model);
+                var responseBody = await resp.Content.ReadAsStringAsync();
+
+
                 var embedBuilder = new EmbedBuilder();
                 embedBuilder.ThumbnailUrl = "https://i.imgur.com/dxCVy9r.png";
-
-                HttpResponseMessage resp = await client.PutAsJsonAsync(Configuration["HttpClient:connStr"] + "/gateway/API/DiscordBot/Command/UpdateDiscord", restModel.Model);
-                var ResponseBody = await resp.Content.ReadAsStringAsync();
                 if (resp.IsSuccessStatusCode)
                 {
                     
                     embedBuilder.AddField("Update Discord",
-                        $"\n{ResponseBody}");
+                        $"\n{responseBody}");
                 }
                 else
                 {
-                    embedBuilder.AddField("BadRequest", ResponseBody);
+                    embedBuilder.AddField("BadRequest", responseBody);
                 }
 
                 embedBuilder.WithColor(Color.DarkOrange);
@@ -201,17 +211,25 @@ namespace BoundBot.Services
         {
             try
             {
-                var client = new HttpClient();
+                var client = _httpClient;
 
                 RestModel restModel = new(command);
+
+               
+
+                restModel.Model.HWID = (command.Data.Options.First().Value as string)!;
+
+                HttpResponseMessage jwtResponseMessage = await client.PostAsJsonAsync($"/gateway/API/DiscordBot/JwtGenerate", restModel.Model);
+                var jwtResponseBody = await jwtResponseMessage.Content.ReadAsStringAsync();
+
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtResponseBody);
+
+                HttpResponseMessage resp = await client.PutAsJsonAsync("/gateway/API/DiscordBot/Command/UpdateHwid", restModel.Model);
+                var responseBody = await resp.Content.ReadAsStringAsync();
 
                 var embedBuilder = new EmbedBuilder();
                 embedBuilder.ThumbnailUrl = "https://i.imgur.com/dxCVy9r.png";
 
-                restModel.Model.HWID = (command.Data.Options.First().Value as string)!;
-
-                HttpResponseMessage resp = await client.PutAsJsonAsync(Configuration["HttpClient:connStr"] + "/gateway/API/DiscordBot/Command/UpdateHwid", restModel.Model);
-                var responseBody = await resp.Content.ReadAsStringAsync();
                 if (resp.IsSuccessStatusCode)
                 {
                     Console.WriteLine($"[POST REST] Successfully executed for {command.CommandName}");
@@ -238,16 +256,21 @@ namespace BoundBot.Services
         {
             try
             {
-                var client = new HttpClient();
+                var client = _httpClient;
 
                 RestModel restModel = new(command);
 
-                var embedBuilder = new EmbedBuilder();
-                embedBuilder.ThumbnailUrl = "https://i.imgur.com/dxCVy9r.png";
+               HttpResponseMessage jwtResponseMessage = await client.PostAsJsonAsync($"/gateway/API/DiscordBot/JwtGenerate", restModel.Model);
+                var jwtResponseBody = await jwtResponseMessage.Content.ReadAsStringAsync();
 
-                HttpResponseMessage resp = await client.GetAsync(Configuration["HttpClient:connStr"] + $"/gateway/API/DiscordBot/Query/CheckMe/{command.User.Username+ " % 23" + command.User.Discriminator}/{command.User.Id}");
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtResponseBody);
+
+                HttpResponseMessage resp = await client.GetAsync($"/gateway/API/DiscordBot/Query/CheckMe/{command.User.Username+ " % 23" + command.User.Discriminator}/{command.User.Id}");
 
                 var responseBody = await resp.Content.ReadAsStringAsync();
+
+                var embedBuilder = new EmbedBuilder();
+                embedBuilder.ThumbnailUrl = "https://i.imgur.com/dxCVy9r.png";
                 if (resp.IsSuccessStatusCode)
                 {
                     var authModels = JsonConvert.DeserializeObject<List<AuthModelDTO>>(responseBody);
@@ -289,19 +312,26 @@ namespace BoundBot.Services
             try
             {
                 RestModel restModel = new(command);
+
                 var embedBuilder = new EmbedBuilder();
                 embedBuilder.ThumbnailUrl = "https://i.imgur.com/dxCVy9r.png";
-
 
                 if (restModel.Model.Roles!.Contains("860603777790771211") || restModel.Model.Roles.Contains("860628656259203092")
                     || restModel.Model.Roles.Contains("Mod") || restModel.Model.Roles.Contains("Staff"))
                 {
-                    var client = new HttpClient();
+                    var client = _httpClient;
 
                     var options = command.Data.Options.First().Value as IUser;
 
-                    HttpResponseMessage resp = await client.GetAsync(Configuration["HttpClient:connStr"] + $"/gateway/API/DiscordBot/Query/CheckDB/{options!.Username+ "%23" + options.Discriminator}/{options.Id}");
+                    HttpResponseMessage jwtResponseMessage = await client.PostAsJsonAsync( $"/gateway/API/DiscordBot/JwtGenerate", restModel.Model);
+                    var jwtResponseBody = await jwtResponseMessage.Content.ReadAsStringAsync();
+
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtResponseBody);
+
+                    HttpResponseMessage resp = await client.GetAsync( $"/gateway/API/DiscordBot/Query/CheckDB/{options!.Username+ "%23" + options.Discriminator}/{options.Id}");
                     var responseBody = await resp.Content.ReadAsStringAsync();
+                    
+                    
                     if (resp.IsSuccessStatusCode)
                     {
                         var authModels = JsonConvert.DeserializeObject<List<AuthModelDTO>>(responseBody);
@@ -358,9 +388,12 @@ namespace BoundBot.Services
                 {
                     restModel.Model.HWID = (command.Data.Options.First().Value as string)!;
 
-                    var client = new HttpClient();
+                    var client = _httpClient;
+                    HttpResponseMessage jwtResponseMessage = await client.PostAsJsonAsync($"/gateway/API/DiscordBot/JwtGenerate", restModel.Model);
+                    var jwtResponseBody = await jwtResponseMessage.Content.ReadAsStringAsync();
 
-                    HttpResponseMessage resp = await client.PostAsJsonAsync(Configuration["HttpClient:connStr"] + $"/gateway/API/DiscordBot/Command/StaffLicense", restModel.Model);
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtResponseBody);
+                    HttpResponseMessage resp = await client.PostAsJsonAsync($"/gateway/API/DiscordBot/Command/StaffLicense", restModel.Model);
                     var responseBody = await resp.Content.ReadAsStringAsync();
                     if (resp.IsSuccessStatusCode)
                     {

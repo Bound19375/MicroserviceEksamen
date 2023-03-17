@@ -66,6 +66,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("hwid", policy => policy.RequireClaim("hwid"));
+    options.AddPolicy("staff", policy => policy.RequireClaim("staff"));
+    options.AddPolicy("admin", policy => policy.RequireClaim("admin"));
 });
 
 var app = builder.Build();

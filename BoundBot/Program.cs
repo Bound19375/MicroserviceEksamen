@@ -16,37 +16,40 @@ public class DiscordBot
 
     public static Task Main(string[] args) => new DiscordBot().MainAsync();
 
-    async Task MainAsync()
-    {
+    async Task MainAsync() {
         var configBuilder = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json")
             .AddEnvironmentVariables()
             .Build();
 
-        var service = new ServiceCollection()
-            .AddScoped(sp => new HttpClient {
-                BaseAddress = new Uri(configBuilder["HttpClient:connStr"] ?? string.Empty)
-            });
-        service.BuildServiceProvider();
+        var service = new ServiceCollection();
+        service.AddHttpClient("httpClient", httpClient =>
+        {
+            httpClient.BaseAddress = new Uri(configBuilder["HttpClient:connStr"] ?? string.Empty);
+        });
+        service.AddScoped<SlashCommandsHandler>();
+        service.AddScoped<CommandHandler>();
+        service.AddTransient<SlashCommandsBuilder>(_ => new SlashCommandsBuilder(Client));
+        var serviceProvider = service.BuildServiceProvider();
 
         Client.Log += Log;
 
-        CommandHandler cHandler = new(Client, Service);
+        var cHandler = serviceProvider.GetRequiredService<CommandHandler>();
         await cHandler.InstallCommandsAsync();
-        
-        SlashCommandsBuilder builder = new(Client);
+
+        var builder = serviceProvider.GetRequiredService<SlashCommandsBuilder>();
         Client.Ready += builder.Client_Ready;
-        SlashCommandsHandler sHandler = new(Client, configBuilder);
+
+        var sHandler = serviceProvider.GetRequiredService<SlashCommandsHandler>();
         Client.SlashCommandExecuted += sHandler.SlashCommandHandler;
 
         // Block this task until the program is closed.
         await Task.Delay(Timeout.Infinite);
     }
 
-    public static DiscordSocketClient GetClient()
-    {
-        return Client;
-    }
+//AddScoped is used when you want to create a new instance of a service for each request within the scope.This means that if you request the same service multiple times within the same scope, you'll get the same instance.
+//AddTransient is used when you want to create a new instance of a service every time it is requested.This means that if you request the same service multiple times, you'll get a different instance each time.
+//AddSingleton is used when you want to create a single instance of a service for the lifetime of the application.This means that if you request the same service multiple times, you'll get the same instance each time.
 
     private Task Log(LogMessage msg)
     {

@@ -1,5 +1,5 @@
+using Confluent.Kafka;
 using MassTransit;
-using MassTransit.SerilogIntegration;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,29 +14,31 @@ builder.Services.AddMassTransit(x =>
     x.UsingInMemory();
     x.AddLogging();
 
-    x.AddRider(r =>
-    {
-        r.UsingKafka((context, cfg) =>
-        {
-            cfg.Host("kafka");
-
-            cfg.ClientId = "BackEnd";
-
-            //cfg.TopmicEndPoint
-
-            //
-        });
-    });
-
-    //x.UsingRabbitMQ((context, cfg) =>
-    //{
-    //    cfg.Host("rabbitMQ", "/", h =>
-    //    {
+    //x.UsingRabbitMq((context, cfg) => {
+    //    cfg.Host("rabbitMQ", "/", h => {
     //        h.Username(builder.Configuration["RabbitMQ:User"]);
     //        h.Password(builder.Configuration["RabbitMQ:Pass"]);
     //    });
     //    cfg.ConfigureEndpoints(context);
     //});
+
+    x.AddRider(r =>
+    {
+        //r.AddProducer();
+        //r.AddConsumer();
+
+        r.UsingKafka((context, cfg) =>
+        {
+            cfg.ClientId = "BackEnd";
+
+            cfg.Host("broker");
+
+            //cfg.TopicEndpoint("my-topic", "my-group-id", e => {
+            //    e.AutoOffsetReset = AutoOffsetReset.Earliest;
+            //    e.ConfigureConsumer<MyConsumer>(context);
+            //});
+        });
+    });
 });
 
 var app = builder.Build();
