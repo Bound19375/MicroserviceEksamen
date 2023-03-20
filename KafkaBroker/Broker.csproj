@@ -25,8 +25,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\DiscordConsumers\DiscordConsumers.csproj" />
     <ProjectReference Include="..\Crosscutting\Crosscutting.csproj" />
+    <ProjectReference Include="..\DiscordNetConsumers\DiscordNetConsumers.csproj" />
   </ItemGroup>
 
 </Project>

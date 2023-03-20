@@ -44,7 +44,7 @@ public class DiscordBot
         client.Ready += builder!.Client_Ready;
 
         var sHandler = serviceProvider.GetService<SlashCommandsHandler>();
-        client.SlashCommandExecuted += sHandler.SlashCommandHandler;
+        client.SlashCommandExecuted += sHandler!.SlashCommandHandler;
 
         // Block this task until the program is closed.
         await Task.Delay(Timeout.Infinite);

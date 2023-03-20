@@ -23,7 +23,7 @@ namespace DiscordBot.Domain
         protected bool IsValidStaffLicense(DiscordModelDTO model)
         {
             return
-                model.Roles.Contains("860603777790771211")
+                model.Roles!.Contains("860603777790771211")
                 || model.Roles.Contains("860628656259203092");
         }
 

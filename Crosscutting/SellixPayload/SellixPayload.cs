@@ -2,6 +2,8 @@
 
 namespace Crosscutting.SellixPayload
 {
+#pragma warning disable CS8618
+
     public class SellixPayloadProductVariants
     {
         public class Product_Variants
@@ -996,5 +998,7 @@ namespace Crosscutting.SellixPayload
 
 
     }
+
+#pragma warning restore CS8618
 
 }

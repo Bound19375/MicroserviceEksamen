@@ -30,6 +30,7 @@
     <ProjectReference Include="..\Auth.Database\Auth.Database.csproj" />
     <ProjectReference Include="..\Crosscutting\Crosscutting.csproj" />
     <ProjectReference Include="..\DiscordBot.Infrastructure\DiscordBot.Infrastructure.csproj" />
+    <ProjectReference Include="..\DiscordNetConsumers\DiscordNetConsumers.csproj" />
   </ItemGroup>
 
   <ItemGroup>

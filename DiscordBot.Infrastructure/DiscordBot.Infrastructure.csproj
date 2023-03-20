@@ -9,16 +9,17 @@
   <ItemGroup>
     <PackageReference Include="Discord.Net" Version="3.9.0" />
     <PackageReference Include="MassTransit" Version="8.0.14" />
+    <PackageReference Include="MassTransit.Kafka" Version="8.0.14" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.14" />
     <PackageReference Include="Quartz" Version="3.6.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\DiscordConsumers\DiscordConsumers.csproj" />
     <ProjectReference Include="..\Auth.Database\Auth.Database.csproj" />
     <ProjectReference Include="..\BoundBot\BoundBot.csproj" />
     <ProjectReference Include="..\Crosscutting\Crosscutting.csproj" />
     <ProjectReference Include="..\DiscordBot.Application\DiscordBot.Application.csproj" />
+    <ProjectReference Include="..\DiscordNetConsumers\DiscordNetConsumers.csproj" />
   </ItemGroup>
 
 </Project>

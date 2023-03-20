@@ -5,7 +5,7 @@ using Crosscutting.TransactionHandling;
 using DiscordBot.Application.Implementation;
 using DiscordBot.Application.Interface;
 using DiscordBot.Infrastructure;
-using DiscordConsumers;
+using DiscordNetConsumers;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -73,34 +73,13 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("admin", policy => policy.RequireClaim("admin"));
 });
 
-
-//builder.Services.AddMassTransit(x => {
-//    //x.UsingInMemory();
-//    x.AddLogging();
-
-//    x.UsingRabbitMq((context, cfg) => {
-//        cfg.Host("rabbitMQ", "/", h => {
-//            h.Username(builder.Configuration["RabbitMQ:User"]);
-//            h.Password(builder.Configuration["RabbitMQ:Pass"]);
-//        });
-//        cfg.ConfigureEndpoints(context);
-//    });
-
-//    x.AddRider(r => {
-
-//        r.UsingKafka((context, cfg) => {
-//            cfg.ClientId = "BackEnd";
-//            cfg.Host("broker");
-//        });
-//    });
-//});
-
-builder.Services.AddMassTransit(x => {
+builder.Services.AddMassTransit(x =>
+{
     //x.UsingInMemory();
     x.AddLogging();
 
     x.UsingRabbitMq((context, cfg) => {
-        cfg.Host("rabbitMQ", "/", h => {
+        cfg.Host("rabbitmq", "/", h => {
             h.Username(builder.Configuration["RabbitMQ:User"]);
             h.Password(builder.Configuration["RabbitMQ:Pass"]);
         });
@@ -112,7 +91,7 @@ builder.Services.AddMassTransit(x => {
         r.AddProducer<KafkaNotificationMessageDto>("Discord-Payment-Notification");
 
         r.UsingKafka((context, cfg) => {
-            cfg.ClientId = "BackEnd";
+            cfg.ClientId = "Api.Discord";
 
             cfg.Host("kafka");
 

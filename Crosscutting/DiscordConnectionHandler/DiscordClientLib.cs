@@ -8,8 +8,10 @@ namespace Crosscutting.DiscordConnectionHandler
     {
         public static class DiscordClient
         {
+#pragma warning disable CS8618
             private static DiscordSocketClient _client;
             private static CommandService _command;
+#pragma warning restore CS8618
 
             public static DiscordSocketClient GetDiscordSocketClient()
             {

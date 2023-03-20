@@ -1,5 +1,5 @@
 using Confluent.Kafka;
-using DiscordConsumers;
+using DiscordNetConsumers;
 using MassTransit;
 using Serilog;
 
@@ -10,27 +10,24 @@ builder.Configuration.AddEnvironmentVariables();
 builder.Logging.ClearProviders().AddSerilog().AddConsole();
 
 //Kafka
-builder.Services.AddMassTransit(x =>
-{
+builder.Services.AddMassTransit(x => {
     //x.UsingInMemory();
     x.AddLogging();
 
     x.UsingRabbitMq((context, cfg) => {
-        cfg.Host("rabbitMQ", "/", h => {
+        cfg.Host("rabbitmq", "/", h => {
             h.Username(builder.Configuration["RabbitMQ:User"]);
             h.Password(builder.Configuration["RabbitMQ:Pass"]);
         });
         cfg.ConfigureEndpoints(context);
     });
 
-    x.AddRider(r =>
-    {
+    x.AddRider(r => {
         r.AddConsumer<DiscordNotificationConsumer>();
         r.AddProducer<KafkaNotificationMessageDto>("Discord-Payment-Notification");
 
-        r.UsingKafka((context, cfg) =>
-        {
-            cfg.ClientId = "BackEnd";
+        r.UsingKafka((context, cfg) => {
+            cfg.ClientId = "Broker";
 
             cfg.Host("kafka");
 

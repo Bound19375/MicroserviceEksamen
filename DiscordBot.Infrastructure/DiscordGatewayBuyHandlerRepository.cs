@@ -4,7 +4,7 @@ using Crosscutting;
 using DiscordBot.Application.Interface;
 using Microsoft.Extensions.Logging;
 using Crosscutting.SellixPayload;
-using DiscordConsumers;
+using DiscordNetConsumers;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,13 +14,13 @@ namespace DiscordBot.Infrastructure
     {
         private readonly AuthDbContext _db;
         private readonly ILogger<DiscordGatewayBuyHandlerRepository> _logger;
-        private readonly IBus _bus;
+        private readonly ITopicProducer<KafkaNotificationMessageDto> _topicProducer;
 
-        public DiscordGatewayBuyHandlerRepository(AuthDbContext db, ILogger<DiscordGatewayBuyHandlerRepository> logger, IBus bus)
+        public DiscordGatewayBuyHandlerRepository(AuthDbContext db, ILogger<DiscordGatewayBuyHandlerRepository> logger, ITopicProducer<KafkaNotificationMessageDto> topicProducer)
         {
             _db = db;
             _logger = logger;
-            _bus = bus;
+            _topicProducer = topicProducer;
         }
 
         async Task IDiscordGatewayBuyHandlerRepository.OrderHandler(SellixPayloadNormal.Root root)
@@ -151,8 +151,7 @@ namespace DiscordBot.Infrastructure
                         WhichSpec = whichSpec
                     };
 
-                    var endpoint = await _bus.GetSendEndpoint(new Uri("kafka:Discord-Payment-Notification"));
-                    await endpoint.Send(message);
+                    await _topicProducer.Produce(message);
                 }
             }
             catch (Exception ex)
