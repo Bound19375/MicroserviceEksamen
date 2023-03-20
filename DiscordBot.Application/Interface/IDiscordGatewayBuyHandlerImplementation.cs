@@ -4,6 +4,6 @@ namespace DiscordBot.Application.Interface
 {
     public interface IDiscordGatewayBuyHandlerImplementation
     {
-        Task WebShopGrantWallet(SellixPayloadNormal.Root root);
+        Task GrantLicense(SellixPayloadNormal.Root root);
     }
 }

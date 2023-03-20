@@ -63,6 +63,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Producer", "Producer", "{AB
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Consumer", "Consumer", "{1E1A6715-591E-484B-A39B-4AD70073F9B8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Discord.Net", "Discord.Net", "{D175A12E-2DEC-4E83-8A14-58D3A77CD44A}"
+	ProjectSection(SolutionItems) = preProject
+		Notification.cs = Notification.cs
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordConsumers", "..\DiscordConsumers\DiscordConsumers.csproj", "{0A20FAEB-9C78-42F3-A552-31FFE99B3C75}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -129,6 +136,10 @@ Global
 		{E23BCF7F-7ED9-4D88-9F9F-1BBDF9FD8E5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E23BCF7F-7ED9-4D88-9F9F-1BBDF9FD8E5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E23BCF7F-7ED9-4D88-9F9F-1BBDF9FD8E5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A20FAEB-9C78-42F3-A552-31FFE99B3C75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A20FAEB-9C78-42F3-A552-31FFE99B3C75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A20FAEB-9C78-42F3-A552-31FFE99B3C75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A20FAEB-9C78-42F3-A552-31FFE99B3C75}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -155,6 +166,8 @@ Global
 		{E23BCF7F-7ED9-4D88-9F9F-1BBDF9FD8E5A} = {C58B2774-CBC4-4CC7-AE46-5F1D6D41C4F7}
 		{AB8B6D98-0D88-4A51-B394-6EDA9482A365} = {D0B41789-14A0-4875-A11A-C9A149D2849D}
 		{1E1A6715-591E-484B-A39B-4AD70073F9B8} = {06126CA2-E7A3-40A8-A54B-0820AAA5E39A}
+		{D175A12E-2DEC-4E83-8A14-58D3A77CD44A} = {AB8B6D98-0D88-4A51-B394-6EDA9482A365}
+		{0A20FAEB-9C78-42F3-A552-31FFE99B3C75} = {1E1A6715-591E-484B-A39B-4AD70073F9B8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CE416F04-8216-4705-B608-C1C8307CA0F1}

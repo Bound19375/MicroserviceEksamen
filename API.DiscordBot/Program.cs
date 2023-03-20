@@ -1,9 +1,12 @@
 using System.Text;
 using Auth.Database;
+using Confluent.Kafka;
 using Crosscutting.TransactionHandling;
 using DiscordBot.Application.Implementation;
 using DiscordBot.Application.Interface;
 using DiscordBot.Infrastructure;
+using DiscordConsumers;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -68,6 +71,57 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("hwid", policy => policy.RequireClaim("hwid"));
     options.AddPolicy("staff", policy => policy.RequireClaim("staff"));
     options.AddPolicy("admin", policy => policy.RequireClaim("admin"));
+});
+
+
+//builder.Services.AddMassTransit(x => {
+//    //x.UsingInMemory();
+//    x.AddLogging();
+
+//    x.UsingRabbitMq((context, cfg) => {
+//        cfg.Host("rabbitMQ", "/", h => {
+//            h.Username(builder.Configuration["RabbitMQ:User"]);
+//            h.Password(builder.Configuration["RabbitMQ:Pass"]);
+//        });
+//        cfg.ConfigureEndpoints(context);
+//    });
+
+//    x.AddRider(r => {
+
+//        r.UsingKafka((context, cfg) => {
+//            cfg.ClientId = "BackEnd";
+//            cfg.Host("broker");
+//        });
+//    });
+//});
+
+builder.Services.AddMassTransit(x => {
+    //x.UsingInMemory();
+    x.AddLogging();
+
+    x.UsingRabbitMq((context, cfg) => {
+        cfg.Host("rabbitMQ", "/", h => {
+            h.Username(builder.Configuration["RabbitMQ:User"]);
+            h.Password(builder.Configuration["RabbitMQ:Pass"]);
+        });
+        cfg.ConfigureEndpoints(context);
+    });
+
+    x.AddRider(r => {
+        r.AddConsumer<DiscordNotificationConsumer>();
+        r.AddProducer<KafkaNotificationMessageDto>("Discord-Payment-Notification");
+
+        r.UsingKafka((context, cfg) => {
+            cfg.ClientId = "BackEnd";
+
+            cfg.Host("kafka");
+
+            cfg.TopicEndpoint<KafkaNotificationMessageDto>("Discord-Payment-Notification", "Discord", e => {
+                e.AutoOffsetReset = AutoOffsetReset.Earliest;
+                e.ConfigureConsumer<DiscordNotificationConsumer>(context);
+            });
+        });
+    });
 });
 
 var app = builder.Build();

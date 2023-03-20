@@ -17,7 +17,7 @@ namespace DiscordBot.Application.Implementation
             _handler = handler;
         }
 
-        async Task IDiscordGatewayBuyHandlerImplementation.WebShopGrantWallet(SellixPayloadNormal.Root root)
+        async Task IDiscordGatewayBuyHandlerImplementation.GrantLicense(SellixPayloadNormal.Root root)
         {
             try
             {
