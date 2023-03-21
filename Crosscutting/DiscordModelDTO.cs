@@ -1,12 +1,13 @@
 ﻿namespace Crosscutting
 {
-    public class DiscordModelDTO
+    public class DiscordModelDto
     {
-        public string Channel { get; set; }
-        public string Command { get; set; }
+        public string Channel { get; set; } = null!;
+        public string Command { get; set; } = null!;
         public List<string>? Roles { get; set; }
-        public string DiscordUsername { get; set; }
-        public string DiscordId { get; set; }
-        public string HWID { get; set; }
+        public string DiscordUsername { get; set; } = null!;
+        public string DiscordId { get; set; } = null!;
+        public string Hwid { get; set; } = null!;
+        public string RefreshToken { get; set; } = null!;
     }
 }

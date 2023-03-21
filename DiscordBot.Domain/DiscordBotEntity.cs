@@ -4,7 +4,7 @@ namespace DiscordBot.Domain
 {
     public class DiscordBotEntity
     {
-        public DiscordBotEntity(DiscordModelDTO model, IsValidCheck check)
+        public DiscordBotEntity(DiscordModelDto model, IsValidCheck check)
         {
             try
             {
@@ -20,7 +20,7 @@ namespace DiscordBot.Domain
                 throw new Exception("Passed Model For Discord Bot Denied By Business Logic");
             }
         }
-        protected bool IsValidStaffLicense(DiscordModelDTO model)
+        protected bool IsValidStaffLicense(DiscordModelDto model)
         {
             return
                 model.Roles!.Contains("860603777790771211")

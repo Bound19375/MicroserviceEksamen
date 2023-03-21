@@ -27,7 +27,7 @@ namespace BoundBot.Services
 
         internal class RestModel
         {
-            public DiscordModelDTO Model { get; set; } = new DiscordModelDTO();
+            public DiscordModelDto Model { get; set; } = new DiscordModelDto();
 
             public RestModel(SocketSlashCommand command)
             {
@@ -153,7 +153,7 @@ namespace BoundBot.Services
                     "Please use the following information I've collected for you upon your purchase!" +
                     $"\r\n\r\nYour Discord Name Is: `{restModel.Model.DiscordUsername}`" +
                     $"\r\nYour Discord ID Is: `{restModel.Model.DiscordId}`" +
-                    "\r\nYour A# HWID Is: Check A# Console." +
+                    "\r\nYour A# Hwid Is: Check A# Console." +
                     "\r\n\r\nIf you're a server booster contact @Bound for your coupon for 10%." +
                     "\r\n\r\nThank you for your interest & support in what I do! <:peepolove:1002285157132271746>");
 
@@ -217,7 +217,7 @@ namespace BoundBot.Services
 
                
 
-                restModel.Model.HWID = (command.Data.Options.First().Value as string)!;
+                restModel.Model.Hwid = (command.Data.Options.First().Value as string)!;
 
                 HttpResponseMessage jwtResponseMessage = await client.PostAsJsonAsync($"/gateway/API/DiscordBot/JwtGenerate", restModel.Model);
                 var jwtResponseBody = await jwtResponseMessage.Content.ReadAsStringAsync();
@@ -234,7 +234,7 @@ namespace BoundBot.Services
                 {
                     Console.WriteLine($"[POST REST] Successfully executed for {command.CommandName}");
 
-                    embedBuilder.AddField("HWID Reset",
+                    embedBuilder.AddField("Hwid Reset",
                         $"\n{responseBody}");
                 }
                 else
@@ -281,7 +281,7 @@ namespace BoundBot.Services
                         builder.AppendLine($"DiscordUsername: {item.DiscordUsername}");
                         builder.AppendLine($"DiscordId: {item.DiscordId}");
                         builder.AppendLine($"Name: {item.ProductName}");
-                        builder.AppendLine($"HWID: {item.HWID}");
+                        builder.AppendLine($"Hwid: {item.HWID}");
                         builder.AppendLine($"EndDate: {item.EndDate}");
                         builder.AppendLine("\n");
                     }
@@ -346,7 +346,7 @@ namespace BoundBot.Services
                             builder.AppendLine($"Lastname: {item.Lastname}");
                             builder.AppendLine($"Email: {item.Email}");
                             builder.AppendLine($"Name: {item.ProductName}");
-                            builder.AppendLine($"HWID: {item.HWID}");
+                            builder.AppendLine($"Hwid: {item.HWID}");
                             builder.AppendLine($"EndDate: {item.EndDate}");
                             builder.AppendLine("\n");
                         }
@@ -386,7 +386,7 @@ namespace BoundBot.Services
                 if (restModel.Model.Roles!.Contains("860603777790771211") || restModel.Model.Roles.Contains("860628656259203092")
                     || restModel.Model.Roles.Contains("Mod") || restModel.Model.Roles.Contains("Staff"))
                 {
-                    restModel.Model.HWID = (command.Data.Options.First().Value as string)!;
+                    restModel.Model.Hwid = (command.Data.Options.First().Value as string)!;
 
                     var client = _httpClient;
                     HttpResponseMessage jwtResponseMessage = await client.PostAsJsonAsync($"/gateway/API/DiscordBot/JwtGenerate", restModel.Model);

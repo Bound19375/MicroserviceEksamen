@@ -27,11 +27,11 @@ namespace DiscordBot.Infrastructure
             _configuration = configuration;
         }
 
-        async Task<string> IDiscordBotCommandRepository.GetStaffLicense(DiscordModelDTO model)
+        async Task<string> IDiscordBotCommandRepository.GetStaffLicense(DiscordModelDto model)
         {
             try
             {
-                _logger.LogInformation(model.DiscordUsername + " Engaged GetStaffLicense At: " + DateTime.Now);
+                _logger.LogInformation(model.DiscordUsername + " Engaged GetStaffLicense At: " + DateTime.UtcNow);
 
                 var check = await _db.ActiveLicenses.Include(user => user.User).Include(order=>order.Order).Where(x => x.User.DiscordId == model.DiscordId || x.User.DiscordUsername == model.DiscordUsername).ToListAsync();
                 var userExists = await _db.User!.FirstOrDefaultAsync(x => x.DiscordId == model.DiscordId && x.DiscordUsername == model.DiscordUsername);
@@ -58,7 +58,7 @@ namespace DiscordBot.Infrastructure
                         Lastname = model.DiscordUsername,
                         DiscordUsername = model.DiscordUsername,
                         DiscordId = model.DiscordId,
-                        HWID = model.HWID,
+                        HWID = model.Hwid,
                     };
 
                     await _db.User.AddAsync(user);
@@ -77,7 +77,7 @@ namespace DiscordBot.Infrastructure
                     UniqId = "STAFF",
                     ProductName = "STAFF",
                     ProductPrice = "STAFF",
-                    PurchaseDate = DateTime.Now,
+                    PurchaseDate = DateTime.UtcNow,
                 };
 
                 await _db.Order.AddAsync(Order);
@@ -87,7 +87,7 @@ namespace DiscordBot.Infrastructure
                 {
                     ProductName = "STAFF",
                     ProductNameEnum = WhichSpec.AIO,
-                    EndDate = DateTime.Now.AddDays(365),
+                    EndDate = DateTime.UtcNow.AddDays(365),
                     UserId = dbUserId,
                     OrderId = Order.OrderId
                 };
@@ -108,18 +108,18 @@ namespace DiscordBot.Infrastructure
             }
         }
 
-        async Task<string> IDiscordBotCommandRepository.UpdateDiscordAndRole(DiscordModelDTO model)
+        async Task<string> IDiscordBotCommandRepository.UpdateDiscordAndRole(DiscordModelDto model)
         {
             try
             {
-                _logger.LogInformation(model.DiscordUsername + " Engaged UpdateDiscord At: " + DateTime.Now);
+                _logger.LogInformation(model.DiscordUsername + " Engaged UpdateDiscord At: " + DateTime.UtcNow);
 
                 var check = await _db.ActiveLicenses.Include(user => user.User).Where(x => x.User.DiscordId == model.DiscordId || x.User.DiscordUsername == model.DiscordUsername).ToListAsync();
                 var makeCheck = await _db.MakeDatabase.Where(discord => discord.DiscordID == model.DiscordId || discord.DiscordUsername == model.DiscordUsername).ToListAsync();
                 
                 if (!check.Any() && !makeCheck.Any()) { throw new Exception($"{model.DiscordUsername} doesn't exist in the database"); }
 
-                int activeLicenses = check.Count(item => item.EndDate < DateTime.Now) + makeCheck.Count();
+                int activeLicenses = check.Count(item => item.EndDate < DateTime.UtcNow) + makeCheck.Count();
 
                 if (activeLicenses >= 0) 
                 {
@@ -171,11 +171,11 @@ namespace DiscordBot.Infrastructure
             }
         }
 
-        async Task<string> IDiscordBotCommandRepository.UpdateHWID(DiscordModelDTO model)
+        async Task<string> IDiscordBotCommandRepository.UpdateHwid(DiscordModelDto model)
         {
             try
             {
-                _logger.LogInformation(model.DiscordId + " Engaged UpdateHwid At: " + DateTime.Now);
+                _logger.LogInformation(model.DiscordId + " Engaged UpdateHwid At: " + DateTime.UtcNow);
 
                 var check = await _db.ActiveLicenses.Include(user=>user.User).Include(order=>order.Order).Where(x=>x.User.DiscordId == model.DiscordId || x.User.DiscordUsername == model.DiscordUsername).ToListAsync();
 
@@ -185,7 +185,7 @@ namespace DiscordBot.Infrastructure
 
                 foreach (var item in check)
                 { 
-                    if (item.EndDate < DateTime.Now) { activeLicenses++; }
+                    if (item.EndDate < DateTime.UtcNow) { activeLicenses++; }
                 }
 
 
@@ -195,7 +195,7 @@ namespace DiscordBot.Infrastructure
                 {
                     foreach (var item in check)
                     {
-                        item.User.HWID = model.HWID;
+                        item.User.HWID = model.Hwid;
 
                         builder.AppendLine(item.Order.UniqId);
 
@@ -204,13 +204,13 @@ namespace DiscordBot.Infrastructure
                 }
 
                 //
-                var Deprecatedcheck = await _db.MakeDatabase.Where(x => x.HWID == model.HWID || x.DiscordUsername == model.DiscordUsername || x.DiscordID == model.DiscordId).ToListAsync();
+                var Deprecatedcheck = await _db.MakeDatabase.Where(x => x.HWID == model.Hwid || x.DiscordUsername == model.DiscordUsername || x.DiscordID == model.DiscordId).ToListAsync();
 
                 //if (!check.Any()) { throw new Exception($"{model.DiscordUsername} doesn't exist in the database"); }
 
                 foreach (var item in Deprecatedcheck)
                 {
-                    item.HWID= model.HWID;
+                    item.HWID= model.Hwid;
 
                     builder.AppendLine(item.OrderID);
 
@@ -219,7 +219,7 @@ namespace DiscordBot.Infrastructure
 
                 if (builder.Length == 0) { throw new Exception($"{model.DiscordUsername} doesn't exist in the database"); } //Remove This
 
-                return await Task.FromResult("HWID & Roles Updated License(s):" +
+                return await Task.FromResult("Hwid & Roles Updated License(s):" +
                     $"\n{builder}");
             }
             catch (Exception ex) 

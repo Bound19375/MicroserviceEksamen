@@ -29,4 +29,8 @@
     <ProjectReference Include="..\DiscordNetConsumers\DiscordNetConsumers.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="MassTransitServiceCollection\" />
+  </ItemGroup>
+
 </Project>

@@ -22,35 +22,6 @@ namespace API.Auth.Controllers
             _configuration = configuration;
         }
 
-        public class JWTModel
-        {
-            public string Hwid { get; set; }
-        }
-
-        [HttpPost("JwtGenerate")]
-        [AllowAnonymous]
-        public async Task<IActionResult> Generate([FromBody] JWTModel body)
-        {
-            var claims = new List<Claim>
-            {
-                new Claim("hwid", body.Hwid),
-                new Claim("role", "User"),
-            };
-
-            var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:SecretKey"]!));
-            var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256Signature);
-
-            var token = new JwtSecurityToken(
-                issuer: _configuration["JWT:ValidIssuer"],
-                audience: _configuration["JWT:ValidAudience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(10),
-                signingCredentials: signingCredentials
-            );;
-
-            return await Task.FromResult(Ok(new JwtSecurityTokenHandler().WriteToken(token)));
-        }
-
         [HttpPost("Authenticate")]
         [Authorize(Roles = "User")]
         [Authorize(Policy = "hwid")]

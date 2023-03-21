@@ -32,10 +32,10 @@ public class DiscordBotCleanupRepository : IDiscordBotCleanupRepository
         {
             var expiredLicenses = await _db.ActiveLicenses
                 .Include(user => user.User)
-                .Where(time => DateTime.Now >= time.EndDate).ToListAsync();
+                .Where(time => DateTime.UtcNow >= time.EndDate).ToListAsync();
 
             var allActiveLicenses = await _db.ActiveLicenses.Include(user => user.User)
-                .Where(time => DateTime.Now < time.EndDate).ToListAsync();
+                .Where(time => DateTime.UtcNow < time.EndDate).ToListAsync();
 
             if (expiredLicenses.Any())
             {

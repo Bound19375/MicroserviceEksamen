@@ -20,7 +20,7 @@ namespace DiscordBot.Application.Implementation
             _command = command;
         }
 
-        async Task<string> IDiscordBotCommandImplementation.GetStaffLicense(DiscordModelDTO model)
+        async Task<string> IDiscordBotCommandImplementation.GetStaffLicense(DiscordModelDto model)
         {
             try
             {
@@ -36,7 +36,7 @@ namespace DiscordBot.Application.Implementation
             }
         }
 
-        async Task<string> IDiscordBotCommandImplementation.UpdateDiscordAndRole(DiscordModelDTO model)
+        async Task<string> IDiscordBotCommandImplementation.UpdateDiscordAndRole(DiscordModelDto model)
         {
             try
             {
@@ -52,12 +52,12 @@ namespace DiscordBot.Application.Implementation
             }
         }
 
-        async Task<string> IDiscordBotCommandImplementation.UpdateHWID(DiscordModelDTO model)
+        async Task<string> IDiscordBotCommandImplementation.UpdateHWID(DiscordModelDto model)
         {
             try
             {
                 await _UoW.CreateTransaction(System.Data.IsolationLevel.Serializable);
-                var result = await _command.UpdateHWID(model);
+                var result = await _command.UpdateHwid(model);
                 await _UoW.Commit();
                 return result;
             }

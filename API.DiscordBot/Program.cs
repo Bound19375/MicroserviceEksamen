@@ -1,6 +1,10 @@
 using System.Text;
 using Auth.Database;
+using Auth.Database.DbContextConfiguration;
+using Broker.MassTransitServiceCollection;
 using Confluent.Kafka;
+using Crosscutting.Configuration.AuthPolicyConfiguration;
+using Crosscutting.Configuration.JwtConfiguration;
 using Crosscutting.TransactionHandling;
 using DiscordBot.Application.Implementation;
 using DiscordBot.Application.Interface;
@@ -10,28 +14,17 @@ using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 //ILogger
-builder.Logging.ClearProviders().AddConsole();
+builder.Logging.ClearProviders().AddSerilog().AddConsole();
 
 //Docker
 builder.Configuration.AddEnvironmentVariables();
 
-// Add services to the container.
-//dotnet tool update --global dotnet-ef
-//dotnet ef migrations add 0.4 --project Auth.Database --startup-project BoundCoreWebApplication --context AuthDbContext
-//dotnet ef database update --project Auth.Database --startup-project BoundCoreWebApplication --context AuthDbContext
-builder.Services.AddDbContext<AuthDbContext>(options =>
-{
-    options.UseMySql(builder.Configuration.GetConnectionString("BoundcoreMaster") ?? throw new InvalidOperationException(),
-        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("BoundcoreMaster")) ?? throw new InvalidOperationException(),
-        x =>
-        {
-
-        });
-});
+builder.Services.AddMasterDbContext(builder.Configuration);
 
 //Dependency Injection
 builder.Services.Scan(a => a.FromCallingAssembly().AddClasses().AsMatchingInterface().WithScopedLifetime());
@@ -51,57 +44,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-            ValidAudience = builder.Configuration["JWT:ValidAudience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"]!))
-        };
-    });
+//JWT
+builder.Services.AddJwtConfiguration(builder.Configuration);
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("hwid", policy => policy.RequireClaim("hwid"));
-    options.AddPolicy("staff", policy => policy.RequireClaim("staff"));
-    options.AddPolicy("admin", policy => policy.RequireClaim("admin"));
-});
+//Policies
+builder.Services.AddPolicyConfiguration();
 
-builder.Services.AddMassTransit(x =>
-{
-    //x.UsingInMemory();
-    x.AddLogging();
-
-    x.UsingRabbitMq((context, cfg) => {
-        cfg.Host("rabbitmq", "/", h => {
-            h.Username(builder.Configuration["RabbitMQ:User"]);
-            h.Password(builder.Configuration["RabbitMQ:Pass"]);
-        });
-        cfg.ConfigureEndpoints(context);
-    });
-
-    x.AddRider(r => {
-        r.AddConsumer<DiscordNotificationConsumer>();
-        r.AddProducer<KafkaNotificationMessageDto>("Discord-Payment-Notification");
-
-        r.UsingKafka((context, cfg) => {
-            cfg.ClientId = "Api.Discord";
-
-            cfg.Host("kafka");
-
-            cfg.TopicEndpoint<KafkaNotificationMessageDto>("Discord-Payment-Notification", "Discord", e => {
-                e.AutoOffsetReset = AutoOffsetReset.Earliest;
-                e.ConfigureConsumer<DiscordNotificationConsumer>(context);
-            });
-        });
-    });
-});
+//Kafka
+builder.Services.AddMassTransitWithRabbitMqAndKafka(builder.Configuration);
 
 var app = builder.Build();
 

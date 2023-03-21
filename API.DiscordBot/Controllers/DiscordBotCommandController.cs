@@ -18,7 +18,7 @@ namespace API.DiscordBot.Controllers
         [Authorize(Roles = "admin")]
         [Authorize(Roles = "staff")]
         [HttpPost("StaffLicense")]
-        public async Task<IActionResult> StaffLicense([FromBody] DiscordModelDTO model)
+        public async Task<IActionResult> StaffLicense([FromBody] DiscordModelDto model)
         {
             try
             {
@@ -34,7 +34,7 @@ namespace API.DiscordBot.Controllers
         [HttpPost("Authenticate")]
         [Authorize(Roles = "User")]
         [HttpPut("UpdateDiscord")]
-        public async Task<IActionResult> UpdateDiscordAndRole([FromBody] DiscordModelDTO model)
+        public async Task<IActionResult> UpdateDiscordAndRole([FromBody] DiscordModelDto model)
         {
             try
             {
@@ -50,7 +50,7 @@ namespace API.DiscordBot.Controllers
         [HttpPost("Authenticate")]
         [Authorize(Roles = "User")]
         [HttpPut("UpdateHwid")]
-        public async Task<IActionResult> UpdateHWID([FromBody] DiscordModelDTO model)
+        public async Task<IActionResult> UpdateHWID([FromBody] DiscordModelDto model)
         {
             try
             {

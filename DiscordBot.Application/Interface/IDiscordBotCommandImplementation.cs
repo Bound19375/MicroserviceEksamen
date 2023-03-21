@@ -9,8 +9,8 @@ namespace DiscordBot.Application.Interface
 {
     public interface IDiscordBotCommandImplementation
     {
-        Task<string> UpdateHWID(DiscordModelDTO model);
-        Task<string> UpdateDiscordAndRole(DiscordModelDTO model);
-        Task<string> GetStaffLicense(DiscordModelDTO model);
+        Task<string> UpdateHWID(DiscordModelDto model);
+        Task<string> UpdateDiscordAndRole(DiscordModelDto model);
+        Task<string> GetStaffLicense(DiscordModelDto model);
     }
 }

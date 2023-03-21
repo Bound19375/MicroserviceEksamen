@@ -35,9 +35,9 @@ namespace DiscordBot.Infrastructure
                         x.DiscordUsername == root.Data.CustomFields.DiscordUser);
 
                     _logger.LogInformation(root.Data.CustomFields.DiscordId + " " + root.Data.CustomFields.DiscordUser +
-                                           " @ Engaged purchase at: " + DateTime.Now);
+                                           " @ Engaged purchase at: " + DateTime.UtcNow);
 
-                    DateTime time = DateTime.Now;
+                    DateTime time = DateTime.UtcNow;
                     WhichSpec whichSpec = WhichSpec.none;
                     int quantity = 0;
 
@@ -54,7 +54,7 @@ namespace DiscordBot.Infrastructure
 
                         if (currentLicenseTime?.EndDate != null)
                         {
-                            if (currentLicenseTime.EndDate >= DateTime.Now)
+                            if (currentLicenseTime.EndDate >= DateTime.UtcNow)
                             {
                                 time = currentLicenseTime.EndDate;
                             }
@@ -83,7 +83,7 @@ namespace DiscordBot.Infrastructure
 
                         if (currentMonthlyLicenseTime != null)
                         {
-                            if (currentMonthlyLicenseTime.EndDate >= DateTime.Now)
+                            if (currentMonthlyLicenseTime.EndDate >= DateTime.UtcNow)
                             {
                                 time = currentMonthlyLicenseTime.EndDate;
                             }
@@ -125,7 +125,7 @@ namespace DiscordBot.Infrastructure
                         UniqId = root.Data.Uniqid,
                         ProductName = root.Data.ProductTitle,
                         ProductPrice = root.Data.TotalDisplay.ToString() ?? "null",
-                        PurchaseDate = DateTime.Now,
+                        PurchaseDate = DateTime.UtcNow,
                     };
 
                     await _db.Order!.AddAsync(order);

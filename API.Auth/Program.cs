@@ -6,8 +6,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Auth.Database.DbContextConfiguration;
+using Crosscutting.Configuration.AuthPolicyConfiguration;
 using Crosscutting.TransactionHandling;
 using MassTransit;
+using Crosscutting.Configuration.JwtConfiguration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,18 +20,8 @@ builder.Logging.ClearProviders().AddConsole();
 //Docker
 builder.Configuration.AddEnvironmentVariables();
 
-// Add services to the container.
-//dotnet ef migrations add 0.1 --project Auth.Database --startup-project BoundCoreWebApplication --context AuthDbContext
-//dotnet ef database update --project Auth.Database --startup-project BoundCoreWebApplication --context AuthDbContext
-builder.Services.AddDbContext<AuthDbContext>(options =>
-{
-    options.UseMySql(builder.Configuration.GetConnectionString("BoundcoreMaster") ?? throw new InvalidOperationException(),
-        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("BoundcoreMaster")) ?? throw new InvalidOperationException(),
-        x =>
-        {
-
-        });
-});
+//DbContext
+builder.Services.AddMasterDbContext(builder.Configuration);
 
 //Dependency Injection
 //builder.Services.AddScoped<IUnitOfWork<IdentityDb>, UnitOfWork<IdentityDb>>();
@@ -44,25 +37,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-        ValidAudience = builder.Configuration["JWT:ValidAudience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"]!))
-    };
-});
+//JWT
+builder.Services.AddJwtConfiguration(builder.Configuration);
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("hwid", policy => policy.RequireClaim("hwid"));
-});
+//Policies
+builder.Services.AddPolicyConfiguration();
 
 var app = builder.Build();
 

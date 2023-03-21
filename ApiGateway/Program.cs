@@ -20,6 +20,8 @@ builder.Services.AddHttpForwarder();
 builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
+builder.Services.AddHttpForwarder();
+
 //TLS
 var certificate = new X509Certificate2(builder.Configuration["Kestrel:Certificates:Default:Path"]!, builder.Configuration["Kestrel:Certificates:Default:Password"]);
 builder.WebHost.UseKestrel(options => {
@@ -49,5 +51,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapReverseProxy();
 
 app.Run();

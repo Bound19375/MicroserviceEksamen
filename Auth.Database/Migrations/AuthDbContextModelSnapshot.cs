@@ -82,7 +82,7 @@ namespace Auth.Database.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("HWID")
+                    b.Property<string>("Hwid")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -170,7 +170,7 @@ namespace Auth.Database.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("HWID")
+                    b.Property<string>("Hwid")
                         .IsRequired()
                         .HasColumnType("longtext");
 

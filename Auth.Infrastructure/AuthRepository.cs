@@ -22,11 +22,11 @@ namespace Auth.Infrastructure
         {
             try
             {
-                _logger.LogInformation(model.HWID + " Engaged Auth At: " + DateTime.Now);
+                _logger.LogInformation(model.HWID + " Engaged Auth At: " + DateTime.UtcNow);
 
                 var returnList = new List<AuthModelDTO>();
 
-                var auth = await _db.ActiveLicenses.Include(user => user.User).Where(user => user.User.HWID == model.HWID && DateTime.Now < user.EndDate).ToListAsync();
+                var auth = await _db.ActiveLicenses.Include(user => user.User).Where(user => user.User.HWID == model.HWID && DateTime.UtcNow < user.EndDate).ToListAsync();
 
                 if (auth.Any())
                 {
@@ -71,7 +71,7 @@ namespace Auth.Infrastructure
                             "AIO [90 Days] [CRYPTO]" => 90,
                             _ => 0
                         }
-                        where DateTime.Now < ele.PurchaseDate.AddDays(whichSpec)
+                        where DateTime.UtcNow < ele.PurchaseDate.AddDays(whichSpec)
                         select new AuthModelDTO
                         {
                             Email = ele.Email,

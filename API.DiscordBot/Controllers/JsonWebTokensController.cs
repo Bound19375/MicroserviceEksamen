@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Crosscutting.Configuration.JwtConfiguration;
 
 namespace API.DiscordBot.Controllers {
 
@@ -18,9 +19,9 @@ namespace API.DiscordBot.Controllers {
             _configuration = configuration;
         }
 
-        [HttpPost("JwtGenerate")]
+        [HttpPost("JwtRefreshAndGenerate")]
         [AllowAnonymous]
-        public async Task<IActionResult> Generate([FromBody] DiscordModelDTO model) 
+        public async Task<IActionResult> Generate([FromBody] DiscordModelDto model) 
         {
              const string adminRoleId = "860603777790771211";
              const string staffRoleId = "860628656259203092";
@@ -42,18 +43,9 @@ namespace API.DiscordBot.Controllers {
                 claims.Add(new Claim("staff", "staff"));
             }
 
-            var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:SecretKey"]!));
-            var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256Signature);
+            var jwt = await JwtApiResponse.JwtRefreshAndGenerate(claims, _configuration, model.RefreshToken);
 
-            var token = new JwtSecurityToken(
-                issuer: _configuration["JWT:ValidIssuer"],
-                audience: _configuration["JWT:ValidAudience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(10),
-                signingCredentials: signingCredentials
-            );
-
-            return await Task.FromResult(Ok(new JwtSecurityTokenHandler().WriteToken(token)));
+            return await Task.FromResult(Ok(jwt));
         }
     }
 }

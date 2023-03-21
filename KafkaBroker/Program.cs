@@ -1,3 +1,4 @@
+using Broker.MassTransitServiceCollection;
 using Confluent.Kafka;
 using DiscordNetConsumers;
 using MassTransit;
@@ -10,34 +11,7 @@ builder.Configuration.AddEnvironmentVariables();
 builder.Logging.ClearProviders().AddSerilog().AddConsole();
 
 //Kafka
-builder.Services.AddMassTransit(x => {
-    //x.UsingInMemory();
-    x.AddLogging();
-
-    x.UsingRabbitMq((context, cfg) => {
-        cfg.Host("rabbitmq", "/", h => {
-            h.Username(builder.Configuration["RabbitMQ:User"]);
-            h.Password(builder.Configuration["RabbitMQ:Pass"]);
-        });
-        cfg.ConfigureEndpoints(context);
-    });
-
-    x.AddRider(r => {
-        r.AddConsumer<DiscordNotificationConsumer>();
-        r.AddProducer<KafkaNotificationMessageDto>("Discord-Payment-Notification");
-
-        r.UsingKafka((context, cfg) => {
-            cfg.ClientId = "Broker";
-
-            cfg.Host("kafka");
-
-            cfg.TopicEndpoint<KafkaNotificationMessageDto>("Discord-Payment-Notification", "Discord", e => {
-                e.AutoOffsetReset = AutoOffsetReset.Earliest;
-                e.ConfigureConsumer<DiscordNotificationConsumer>(context);
-            });
-        });
-    });
-});
+builder.Services.AddMassTransitWithRabbitMqAndKafka(builder.Configuration);
 
 var app = builder.Build();
 

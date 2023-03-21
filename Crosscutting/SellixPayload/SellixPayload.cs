@@ -29,7 +29,7 @@ namespace Crosscutting.SellixPayload
 
         public class CustomFields
         {
-            [JsonProperty("HWID")]
+            [JsonProperty("Hwid")]
             public string HWID;
 
             [JsonProperty("name")]
@@ -519,7 +519,7 @@ namespace Crosscutting.SellixPayload
 
         public class CustomFields
         {
-            [JsonProperty("HWID")]
+            [JsonProperty("Hwid")]
             public string HWID;
 
             [JsonProperty("name")]
