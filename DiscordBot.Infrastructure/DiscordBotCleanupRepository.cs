@@ -88,7 +88,7 @@ public class DiscordBotCleanupRepository : IDiscordBotCleanupRepository
             }
                 
 
-            _logger.LogInformation("Finished Roles & DB Purge");
+            _logger.LogInformation("NotificationReady Roles & DB Purge");
         }
         catch (Exception ex)
         {

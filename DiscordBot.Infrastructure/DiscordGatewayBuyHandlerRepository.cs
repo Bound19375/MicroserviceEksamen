@@ -148,7 +148,8 @@ namespace DiscordBot.Infrastructure
                         Payload = root,
                         Quantity = quantity,
                         Time = time,
-                        WhichSpec = whichSpec
+                        WhichSpec = whichSpec,
+                        State = NotificationMessageState.NotificationReady
                     };
 
                     await _topicProducer.Produce(message);
