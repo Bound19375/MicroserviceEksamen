@@ -17,7 +17,7 @@ namespace Crosscutting.TransactionHandling
         {
             try 
             {
-                _transaction = _context.Database.CurrentTransaction ?? await _context.Database.BeginTransactionAsync();
+                _transaction = _context.Database.CurrentTransaction ?? await _context.Database.BeginTransactionAsync(isolationLevel: isolationLevel);
             }
             catch (Exception exception) {
                 throw new Exception(exception.ToString());

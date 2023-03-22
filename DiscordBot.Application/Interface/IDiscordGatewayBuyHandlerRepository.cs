@@ -1,9 +1,10 @@
 ﻿using Crosscutting.SellixPayload;
+using DiscordNetConsumers;
 
 namespace DiscordBot.Application.Interface
 {
     public interface IDiscordGatewayBuyHandlerRepository
     {
-        Task OrderHandler(SellixPayloadNormal.Root root);
+        Task<KafkaNotificationMessageDto> OrderHandler(SellixPayloadNormal.Root root);
     }
 }

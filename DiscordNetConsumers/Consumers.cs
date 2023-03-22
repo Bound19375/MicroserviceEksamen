@@ -19,6 +19,7 @@ namespace DiscordNetConsumers
 
     public enum NotificationMessageState
     {
+        Failed,
         Processing,
         NotificationReady
     }

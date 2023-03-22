@@ -14,16 +14,14 @@ namespace DiscordBot.Infrastructure
     {
         private readonly AuthDbContext _db;
         private readonly ILogger<DiscordGatewayBuyHandlerRepository> _logger;
-        private readonly ITopicProducer<KafkaNotificationMessageDto> _topicProducer;
 
-        public DiscordGatewayBuyHandlerRepository(AuthDbContext db, ILogger<DiscordGatewayBuyHandlerRepository> logger, ITopicProducer<KafkaNotificationMessageDto> topicProducer)
+        public DiscordGatewayBuyHandlerRepository(AuthDbContext db, ILogger<DiscordGatewayBuyHandlerRepository> logger)
         {
             _db = db;
             _logger = logger;
-            _topicProducer = topicProducer;
         }
 
-        async Task IDiscordGatewayBuyHandlerRepository.OrderHandler(SellixPayloadNormal.Root root)
+        async Task<KafkaNotificationMessageDto> IDiscordGatewayBuyHandlerRepository.OrderHandler(SellixPayloadNormal.Root root)
         {
             try
             {
@@ -151,14 +149,16 @@ namespace DiscordBot.Infrastructure
                         WhichSpec = whichSpec,
                         State = NotificationMessageState.NotificationReady
                     };
-
-                    await _topicProducer.Produce(message);
                 }
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
+
+            return new KafkaNotificationMessageDto {
+                State = NotificationMessageState.Failed
+            };
         }
     }
 }

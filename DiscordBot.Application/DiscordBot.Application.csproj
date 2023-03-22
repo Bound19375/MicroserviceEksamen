@@ -7,12 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MassTransit.Kafka" Version="8.0.14" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.14" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Auth.Database\Auth.Database.csproj" />
+    <ProjectReference Include="..\DiscordNetConsumers\DiscordNetConsumers.csproj" />
   </ItemGroup>
 
 </Project>
