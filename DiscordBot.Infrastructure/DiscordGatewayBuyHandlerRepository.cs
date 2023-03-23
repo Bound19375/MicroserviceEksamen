@@ -147,7 +147,7 @@ namespace DiscordBot.Infrastructure
                         Quantity = quantity,
                         Time = time,
                         WhichSpec = whichSpec,
-                        State = NotificationMessageState.NotificationReady
+                        State = DiscordTransportMessageState.NotificationReady
                     };
                 }
             }
@@ -157,7 +157,7 @@ namespace DiscordBot.Infrastructure
             }
 
             return new KafkaNotificationMessageDto {
-                State = NotificationMessageState.Failed
+                State = DiscordTransportMessageState.Failed
             };
         }
     }

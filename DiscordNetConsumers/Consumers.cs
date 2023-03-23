@@ -14,10 +14,10 @@ namespace DiscordNetConsumers
         public int Quantity { get; init; }
         public DateTime Time { get; init; }
         public WhichSpec WhichSpec { get; init; }
-        public NotificationMessageState State { get; init; }
+        public DiscordTransportMessageState State { get; init; }
     }
 
-    public enum NotificationMessageState
+    public enum DiscordTransportMessageState
     {
         Failed,
         Processing,
@@ -38,7 +38,7 @@ namespace DiscordNetConsumers
 
         public async Task Consume(ConsumeContext<KafkaNotificationMessageDto> context) 
         {
-            if (context.Message.State == NotificationMessageState.NotificationReady)
+            if (context.Message.State == DiscordTransportMessageState.NotificationReady)
             {
                 var clientUser = await _client.GetUserAsync(ulong.Parse(context.Message.Payload!.Data.CustomFields.DiscordId));
 

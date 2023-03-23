@@ -30,7 +30,7 @@ namespace DiscordBot.Application.Implementation
                 var message = await _handler.OrderHandler(root);
                 await _uoW.Commit();
 
-                if (message.State == NotificationMessageState.NotificationReady)
+                if (message.State == DiscordTransportMessageState.NotificationReady)
                 {
                     await _topicProducer.Produce(message);
                 }
