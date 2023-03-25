@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Auth.Database\Auth.Database.csproj" />
     <ProjectReference Include="..\DiscordNetConsumers\DiscordNetConsumers.csproj" />
+    <ProjectReference Include="..\KafkaBroker\Broker.csproj" />
   </ItemGroup>
 
 </Project>

@@ -12,10 +12,10 @@ namespace DiscordBot.Application.Implementation
     {
         private readonly IUnitOfWork<AuthDbContext> _uoW;
         private readonly IDiscordGatewayBuyHandlerRepository _handler;
-        private readonly ITopicProducer<KafkaNotificationMessageDto> _topicProducer;
+        private readonly ITopicProducer<KafkaDiscordSagaMessageDto> _topicProducer;
 
 
-        public DiscordGatewayBuyHandlerImplementation(IUnitOfWork<AuthDbContext> uoW, IDiscordGatewayBuyHandlerRepository handler, ITopicProducer<KafkaNotificationMessageDto> topicProducer)
+        public DiscordGatewayBuyHandlerImplementation(IUnitOfWork<AuthDbContext> uoW, IDiscordGatewayBuyHandlerRepository handler, ITopicProducer<KafkaDiscordSagaMessageDto> topicProducer)
         {
             _uoW = uoW;
             _handler = handler;

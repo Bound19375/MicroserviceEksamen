@@ -1,15 +1,14 @@
-﻿using Crosscutting;
-using Crosscutting.DiscordConnectionHandler.DiscordClientLibrary;
-using Crosscutting.SellixPayload;
-using Discord;
-using Discord.WebSocket;
+﻿using Crosscutting.SellixPayload;
+using Crosscutting;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using DiscordNetConsumers;
 
-namespace DiscordNetConsumers 
+namespace DiscordNetConsumers
 {
-    public record KafkaNotificationMessageDto {
+    public record KafkaDiscordSagaMessageDto 
+    {
         public SellixPayloadNormal.Root? Payload { get; init; }
         public int Quantity { get; init; }
         public DateTime Time { get; init; }
@@ -20,78 +19,85 @@ namespace DiscordNetConsumers
     public enum DiscordTransportMessageState
     {
         Failed,
-        Processing,
+        LicenseGrantReady,
         NotificationReady
     }
 
-    public class DiscordNotificationConsumer : IConsumer<KafkaNotificationMessageDto> 
+    public class KafaDiscordSagaState : SagaStateMachineInstance
     {
-        private readonly DiscordSocketClient _client = DiscordClient.GetDiscordSocketClient();
-        private readonly ILogger<DiscordNotificationConsumer> _logger;
-        private readonly IConfiguration _configuration;
+        public Guid CorrelationId { get; set; }
 
-        public DiscordNotificationConsumer(IConfiguration configuration, ILogger<DiscordNotificationConsumer> logger) 
+        public KafkaDiscordSagaMessageDto? Message { get; set; }
+        public DiscordTransportMessageState State { get; set; }
+    }
+
+
+    public class KafkaDiscordSagaStateMachine : MassTransitStateMachine<KafaDiscordSagaState>
+    {
+        public State MessageProcessedState { get; private set; }
+        public State NotificationReadyState { get; private set; }
+
+        public Event<KafaDiscordSagaState> NotificationReadyEvent { get; private set; }
+        public Event<KafaDiscordSagaState> LicenseGrantReadyEvent { get; private set; }
+
+        public KafkaDiscordSagaStateMachine()
         {
-            _configuration = configuration;
-            _logger = logger;
-        }
+            InstanceState(x => State(x.State.ToString()));
 
-        public async Task Consume(ConsumeContext<KafkaNotificationMessageDto> context) 
-        {
-            if (context.Message.State == DiscordTransportMessageState.NotificationReady)
-            {
-                var clientUser = await _client.GetUserAsync(ulong.Parse(context.Message.Payload!.Data.CustomFields.DiscordId));
+            Event(() => NotificationReadyEvent, x => x.CorrelateById(x => x.Message.CorrelationId));
+            Event(() => LicenseGrantReadyEvent, x => x.CorrelateById(x => x.Message.CorrelationId));
 
-                if (clientUser != null) {
-                    var guild = _client.GetGuild(ulong.Parse(_configuration["Discord:Guid"]!));
-                    IGuildUser? guildUser = null;
-                    if (guild != null) {
-                        guildUser = guild.GetUser(clientUser.Id);
-                    }
+            Initially(
+                When(LicenseGrantReadyEvent)
+                    .Then(context =>
+                    {
+                        context.Saga.Message = context.Message.Message;
+                        context.Saga.State = DiscordTransportMessageState.LicenseGrantReady;
+                    })
+                    .TransitionTo(MessageProcessedState)
+            );
 
-                    if (guildUser != null && guild != null) {
-                        ulong roleId = (ulong)(context.Message.WhichSpec == WhichSpec.AIO ? 986361482377826334 : 911959454323445840);
-                        var role = guild.GetRole(roleId);
-                        await guildUser.AddRoleAsync(role);
-                    }
+            During(MessageProcessedState,
+                When(NotificationReadyEvent)
+                    .Then(context => context.Instance.State = DiscordTransportMessageState.NotificationReady)
+                    .TransitionTo(NotificationReadyState)
+            );
 
-                    bool couldSendToUser = false;
-                    try {
-                        var embed = new EmbedBuilder()
-                        .WithThumbnailUrl("https://i.imgur.com/dxCVy9r.png")
-                        .AddField("Confirmation", $"You've been successfully added to the database & roled!" +
-                            $"\nOrderId: {context.Message.Payload.Data.Uniqid}" +
-                            $"\nProduct: {context.Message.Payload.Data.ProductTitle}" +
-                            $"\nEndDate: {context.Message.Time.AddDays(Convert.ToInt32(1 * context.Message.Quantity))}" +
-                            "\nPlease read the instruction channels & faq!")
-                        .WithColor(Color.DarkOrange)
-                        .WithCurrentTimestamp()
-                        .Build();
+            //During(NotificationReadyState,
+            //    // add code to execute when in the NotificationReady state
+            //    // you can access the saga instance using 'context.Instance'
+            //);
 
-                        await clientUser.SendMessageAsync("", false, embed);
-                        couldSendToUser = true;
-                    }
-                    catch {
-                        _logger.LogInformation("Wasn't able to DM: " + context.Message.Payload.Data.CustomFields.DiscordUser);
-                    }
+            //During(LicenseGrantReadyState,
+            //    // add code to execute when in the LicenseGrantReady state
+            //    // you can access the saga instance using 'context.Instance'
+            //);
 
-                    var privateEmbed = new EmbedBuilder()
-                        .WithThumbnailUrl("https://i.imgur.com/dxCVy9r.png")
-                        .AddField("Confirmation",
-                            $"\n{clientUser.Mention} has been successfully added to the database & roled!" +
-                            $"\nUser Notified: {couldSendToUser}" +
-                            $"\nOrderId: {context.Message.Payload.Data.Uniqid}" +
-                            $"\nProduct: {context.Message.Payload.Data.ProductTitle}" +
-                            $"\nEndDate: {context.Message.Time.AddDays(Convert.ToInt32(1 * context.Message.Quantity))}")
-                        .WithColor(Color.DarkOrange)
-                        .WithCurrentTimestamp()
-                        .Build();
-
-                    var privateChannel = await _client.GetChannelAsync(862658521065848872); //NotifyChannel
-                    var textNotifier = privateChannel as SocketTextChannel;
-                    await textNotifier!.SendMessageAsync("", false, privateEmbed);
-                }
-            }
+            SetCompletedWhenFinalized();
         }
     }
 }
+
+
+
+
+    public class DiscordNotificationConsumer : IConsumer<KafkaDiscordSagaMessageDto>
+    {
+        private readonly ILogger<DiscordNotificationConsumer> _logger;
+        // private readonly IDiscordBotNotificationRepository _botNotification;
+
+        public DiscordNotificationConsumer(IConfiguration configuration, ILogger<DiscordNotificationConsumer> logger)
+        {
+            _logger = logger;
+        }
+
+        public async Task Consume(ConsumeContext<KafkaDiscordSagaMessageDto> context)
+        {
+            if (context.Message.State == DiscordTransportMessageState.NotificationReady)
+            {
+                _logger.LogInformation("NotificationReady Queue Executed: " + context.Message);
+
+
+            }
+        }
+    }

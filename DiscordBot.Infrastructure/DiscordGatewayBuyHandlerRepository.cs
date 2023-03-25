@@ -1,11 +1,10 @@
 ﻿using Auth.Database;
 using Auth.Database.Model;
+using DiscordNetConsumers;
 using Crosscutting;
 using DiscordBot.Application.Interface;
 using Microsoft.Extensions.Logging;
 using Crosscutting.SellixPayload;
-using DiscordNetConsumers;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace DiscordBot.Infrastructure
@@ -21,7 +20,7 @@ namespace DiscordBot.Infrastructure
             _logger = logger;
         }
 
-        async Task<KafkaNotificationMessageDto> IDiscordGatewayBuyHandlerRepository.OrderHandler(SellixPayloadNormal.Root root)
+        async Task<KafkaDiscordSagaMessageDto> IDiscordGatewayBuyHandlerRepository.OrderHandler(SellixPayloadNormal.Root root)
         {
             try
             {
@@ -141,7 +140,7 @@ namespace DiscordBot.Infrastructure
                     await _db.ActiveLicenses!.AddAsync(licenses);
                     await _db.SaveChangesAsync();
 
-                    var message = new KafkaNotificationMessageDto
+                    var message = new KafkaDiscordSagaMessageDto
                     {
                         Payload = root,
                         Quantity = quantity,
@@ -156,7 +155,7 @@ namespace DiscordBot.Infrastructure
                 throw new Exception(ex.Message);
             }
 
-            return new KafkaNotificationMessageDto {
+            return new KafkaDiscordSagaMessageDto {
                 State = DiscordTransportMessageState.Failed
             };
         }

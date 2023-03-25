@@ -26,14 +26,14 @@ public static class MassTransitConfiguration {
 
             x.AddRider(r => {
                 r.AddConsumer<DiscordNotificationConsumer>();
-                r.AddProducer<KafkaNotificationMessageDto>("Discord-Payment-Notification");
+                r.AddProducer<KafkaDiscordSagaMessageDto>("Discord-Payment-Notification");
 
                 r.UsingKafka((context, cfg) => {
                     cfg.ClientId = "Api.Discord";
 
                     cfg.Host("kafka");
 
-                    cfg.TopicEndpoint<KafkaNotificationMessageDto>("Discord-Payment-Notification", "Discord", e => {
+                    cfg.TopicEndpoint<KafkaDiscordSagaMessageDto>("Discord-Payment-Notification", "Discord", e => {
                         e.CreateIfMissing(p => p.NumPartitions = 1);
                         e.AutoOffsetReset = AutoOffsetReset.Earliest;
                         e.ConfigureConsumer<DiscordNotificationConsumer>(context);

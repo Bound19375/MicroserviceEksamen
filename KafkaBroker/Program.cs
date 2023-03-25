@@ -1,7 +1,4 @@
 using Broker.MassTransitServiceCollection;
-using Confluent.Kafka;
-using DiscordNetConsumers;
-using MassTransit;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
 
 builder.Logging.ClearProviders().AddSerilog().AddConsole();
+    
+//builder.Services.AddScoped<IDiscordBotNotificationRepository, DiscordBotRepository>();
 
 //Kafka
 builder.Services.AddMassTransitWithRabbitMqAndKafka(builder.Configuration);
