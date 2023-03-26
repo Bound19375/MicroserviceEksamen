@@ -10,6 +10,7 @@
     <Folder Include="certs\fullchain1.pem\" />
     <Folder Include="certs\privkey1.pem\" />
     <Folder Include="Configuration\AuthPolicyConfiguration\" />
+    <Folder Include="KafkaDto\Discord\" />
   </ItemGroup>
 
   <ItemGroup>

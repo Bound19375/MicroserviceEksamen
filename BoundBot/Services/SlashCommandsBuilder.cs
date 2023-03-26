@@ -2,11 +2,6 @@
 using Discord.Net;
 using Discord.WebSocket;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BoundBot.Services
 {
@@ -57,7 +52,7 @@ namespace BoundBot.Services
             commands.Add(guildCommand.Build());
 
             //Staff
-            guildCommand =new();
+            guildCommand = new();
             guildCommand.WithName("checkdb");
             guildCommand.WithDescription("Check active license(s) for user");
             guildCommand.AddOption("user", ApplicationCommandOptionType.User, "User", true);
@@ -72,7 +67,7 @@ namespace BoundBot.Services
             try
             {
                 await Client.BulkOverwriteGlobalApplicationCommandsAsync(commands.ToArray());
-               
+
                 /*
                 foreach (var ele in commands)
                 {

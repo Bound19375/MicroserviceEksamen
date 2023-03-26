@@ -24,12 +24,15 @@ builder.Services.AddHttpForwarder();
 
 //TLS
 var certificate = new X509Certificate2(builder.Configuration["Kestrel:Certificates:Default:Path"]!, builder.Configuration["Kestrel:Certificates:Default:Password"]);
-builder.WebHost.UseKestrel(options => {
-    options.Listen(IPAddress.Any, 80, listenOptions => {
+builder.WebHost.UseKestrel(options =>
+{
+    options.Listen(IPAddress.Any, 80, listenOptions =>
+    {
         listenOptions.UseConnectionLogging();
     });
 
-    options.Listen(IPAddress.Any, 443, listenOptions => {
+    options.Listen(IPAddress.Any, 443, listenOptions =>
+    {
         listenOptions.UseHttps(certificate);
         listenOptions.UseConnectionLogging();
     });
@@ -41,7 +44,8 @@ app.MapHealthChecks("/health");
 
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment()) {
+if (app.Environment.IsDevelopment())
+{
     app.UseSwagger();
     app.UseSwaggerUI();
 }

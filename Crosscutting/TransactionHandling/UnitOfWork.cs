@@ -1,6 +1,6 @@
-﻿using System.Data;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using System.Data;
 
 namespace Crosscutting.TransactionHandling
 {
@@ -15,11 +15,12 @@ namespace Crosscutting.TransactionHandling
         }
         async Task IUnitOfWork<T>.CreateTransaction(IsolationLevel isolationLevel)
         {
-            try 
+            try
             {
                 _transaction = _context.Database.CurrentTransaction ?? await _context.Database.BeginTransactionAsync(isolationLevel: isolationLevel);
             }
-            catch (Exception exception) {
+            catch (Exception exception)
+            {
                 throw new Exception(exception.ToString());
             }
         }

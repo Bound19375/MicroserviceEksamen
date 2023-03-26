@@ -1,11 +1,11 @@
 ﻿using Crosscutting;
 using Crosscutting.DiscordConnectionHandler.DiscordClientLibrary;
-using Discord.WebSocket;
+using Crosscutting.KafkaDto.Discord;
 using Discord;
+using Discord.WebSocket;
 using DiscordBot.Application.Interface;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using DiscordNetConsumers;
 
 namespace DiscordBot.Infrastructure;
 

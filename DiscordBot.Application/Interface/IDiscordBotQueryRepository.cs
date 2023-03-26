@@ -1,5 +1,4 @@
 ﻿using Crosscutting;
-using Discord.WebSocket;
 
 namespace DiscordBot.Application.Interface
 {

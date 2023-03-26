@@ -13,7 +13,8 @@ public class DiscordBot
 {
     public static Task Main(string[] args) => new DiscordBot().MainAsync();
 
-    async Task MainAsync() {
+    async Task MainAsync()
+    {
         var configBuilder = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json")
             .AddEnvironmentVariables()

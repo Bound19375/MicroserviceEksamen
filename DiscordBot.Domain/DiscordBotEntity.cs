@@ -27,7 +27,7 @@ namespace DiscordBot.Domain
                 || model.Roles.Contains("860628656259203092");
         }
 
-        
+
 
         public enum IsValidCheck
         {

@@ -18,7 +18,7 @@ namespace Auth.Application.Implementation
                 return await _authRepository.Auth(model);
             }
             catch (Exception ex)
-            { 
+            {
                 throw new Exception(ex.Message);
             }
         }

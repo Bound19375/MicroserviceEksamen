@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Auth.Database.Model
 {
@@ -16,13 +11,13 @@ namespace Auth.Database.Model
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string UserId { get; set; }
-        
+
         public string Email { get; set; }
-        
+
         public string Firstname { get; set; }
-        
+
         public string Lastname { get; set; }
-        
+
         [Required]
         [RegularExpression("^(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{4,}$", ErrorMessage = "Discord Name Isn't In Correct Format!")]
         public string DiscordUsername { get; set; }

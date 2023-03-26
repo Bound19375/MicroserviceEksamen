@@ -1,12 +1,12 @@
 ﻿using Auth.Database;
+using Crosscutting.DiscordConnectionHandler.DiscordClientLibrary;
+using Crosscutting.TransactionHandling;
 using Discord;
 using Discord.WebSocket;
 using DiscordBot.Application.Interface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Crosscutting.DiscordConnectionHandler.DiscordClientLibrary;
-using Crosscutting.TransactionHandling;
 
 namespace DiscordBot.Infrastructure;
 
@@ -86,7 +86,7 @@ public class DiscordBotCleanupRepository : IDiscordBotCleanupRepository
             {
                 _logger.LogInformation("Role Removal Exception: " + ex.Message);
             }
-                
+
 
             _logger.LogInformation("NotificationReady Roles & DB Purge");
         }

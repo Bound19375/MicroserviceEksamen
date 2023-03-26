@@ -7,7 +7,7 @@ namespace DbCleanupService.HostService
     public class HostService : IJob
     {
         private readonly IDiscordBotCleanupImplementation _cleanUp;
-        public HostService(IDiscordBotCleanupImplementation cleanup) 
+        public HostService(IDiscordBotCleanupImplementation cleanup)
         {
             _cleanUp = cleanup;
         }

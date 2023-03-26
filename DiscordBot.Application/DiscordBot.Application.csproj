@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -14,8 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Auth.Database\Auth.Database.csproj" />
-    <ProjectReference Include="..\DiscordNetConsumers\DiscordNetConsumers.csproj" />
-    <ProjectReference Include="..\KafkaBroker\Broker.csproj" />
+    <ProjectReference Include="..\Crosscutting\Crosscutting.csproj" />
   </ItemGroup>
 
 </Project>

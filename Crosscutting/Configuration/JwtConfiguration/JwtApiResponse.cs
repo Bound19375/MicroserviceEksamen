@@ -1,21 +1,23 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.Extensions.Configuration;
 
 namespace Crosscutting.Configuration.JwtConfiguration;
 
 public static class JwtApiResponse
 {
-    public static async Task<object> JwtRefreshAndGenerate(IEnumerable<Claim> claims, IConfiguration configuration, string refreshToken = null!) {
+    public static async Task<object> JwtRefreshAndGenerate(IEnumerable<Claim> claims, IConfiguration configuration, string refreshToken = null!)
+    {
         // check if a refresh token was provided
-        if (!string.IsNullOrEmpty(refreshToken)) {
+        if (!string.IsNullOrEmpty(refreshToken))
+        {
             // validate the refresh token against the storage mechanism
             var validRefreshToken = await ValidateRefreshTokenAsync(refreshToken);
 
             // if the refresh token is valid, generate a new access token
-            if (validRefreshToken) 
+            if (validRefreshToken)
             {
                 var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:SecretKey"]!));
                 var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256Signature);
@@ -29,13 +31,15 @@ public static class JwtApiResponse
                 );
 
                 // create a new refresh token and save it to storage mechanism
-                var newRefreshToken = new RefreshToken {
+                var newRefreshToken = new RefreshToken
+                {
                     Token = Guid.NewGuid().ToString(),
                     Expiration = DateTime.UtcNow.AddMinutes(10),
                 };
                 await SaveRefreshTokenAsync(newRefreshToken);
 
-                return new {
+                return new
+                {
                     AccessToken = new JwtSecurityTokenHandler().WriteToken(token),
                     ExpiresIn = token.ValidTo,
                     RefreshToken = newRefreshToken.Token
@@ -55,13 +59,15 @@ public static class JwtApiResponse
             signingCredentials: signingCredentials2
         );
 
-        var newRefreshToken2 = new RefreshToken {
+        var newRefreshToken2 = new RefreshToken
+        {
             Token = Guid.NewGuid().ToString(),
             Expiration = DateTime.UtcNow.AddMinutes(10),
         };
         await SaveRefreshTokenAsync(newRefreshToken2);
 
-        return new {
+        return new
+        {
             AccessToken = new JwtSecurityTokenHandler().WriteToken(accessToken),
             ExpiresIn = accessToken.ValidTo,
             RefreshToken = newRefreshToken2.Token
@@ -77,13 +83,14 @@ public static class JwtApiResponse
         return await Task.FromResult(RefreshTokens.Any(rt => rt.Token == refreshToken && rt.Expiration > DateTime.UtcNow));
     }
 
-    private static async Task SaveRefreshTokenAsync(RefreshToken refreshToken) 
+    private static async Task SaveRefreshTokenAsync(RefreshToken refreshToken)
     {
         await Task.Run(() => RefreshTokens.Add(refreshToken));
     }
 }
 
-public class RefreshToken {
+public class RefreshToken
+{
     public string Token { get; set; } = null!;
     public DateTime Expiration { get; set; }
 }

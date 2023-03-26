@@ -1,16 +1,14 @@
 ﻿using Crosscutting;
+using Crosscutting.Configuration.JwtConfiguration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
-using Crosscutting.Configuration.JwtConfiguration;
 
-namespace API.DiscordBot.Controllers {
+namespace API.DiscordBot.Controllers
+{
 
     [Route("API/DiscordBot/")]
-    public class JsonWebTokensController : Controller 
+    public class JsonWebTokensController : Controller
     {
         private readonly IConfiguration _configuration;
 
@@ -21,10 +19,10 @@ namespace API.DiscordBot.Controllers {
 
         [HttpPost("JwtRefreshAndGenerate")]
         [AllowAnonymous]
-        public async Task<IActionResult> Generate([FromBody] DiscordModelDto model) 
+        public async Task<IActionResult> Generate([FromBody] DiscordModelDto model)
         {
-             const string adminRoleId = "860603777790771211";
-             const string staffRoleId = "860628656259203092";
+            const string adminRoleId = "860603777790771211";
+            const string staffRoleId = "860628656259203092";
 
             var claims = new List<Claim>
             {

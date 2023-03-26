@@ -1,12 +1,7 @@
 ﻿using Auth.Application.Interface;
+using Crosscutting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Crosscutting;
-using MassTransit.NewIdProviders;
 
 namespace API.Auth.Controllers
 {
@@ -15,7 +10,7 @@ namespace API.Auth.Controllers
     {
         private readonly IAuthImplementation _auth;
         private readonly IConfiguration _configuration;
-        
+
         public AuthController(IAuthImplementation auth, IConfiguration configuration)
         {
             _auth = auth;
@@ -25,7 +20,7 @@ namespace API.Auth.Controllers
         [HttpPost("Authenticate")]
         [Authorize(Roles = "User")]
         [Authorize(Policy = "hwid")]
-        public async  Task<IActionResult> Auth([FromBody] AuthModelDTO model)
+        public async Task<IActionResult> Auth([FromBody] AuthModelDTO model)
         {
             try
             {

@@ -1,7 +1,7 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using System.Reflection;
-using Discord;
 
 namespace BoundBot.Services
 {
@@ -86,13 +86,13 @@ namespace BoundBot.Services
             int argPos = 0;
 
             // Determine if the message is a command based on the prefix and make sure no bots trigger commands
-             Console.WriteLine($"content: {message.Content} Bot: {message.Author.IsBot} Channel: {message.Channel.Id}" );
+            Console.WriteLine($"content: {message.Content} Bot: {message.Author.IsBot} Channel: {message.Channel.Id}");
 
             if (message.Channel.Id.ToString() == 879325830021529630.ToString()
                 || message.Channel.Id.ToString() == 913222623150878751.ToString()
                 || message.Channel.Id.ToString() == 1079815280190033950.ToString())
             {
-                if(message.Author.IsBot != true
+                if (message.Author.IsBot != true
                 && (message.Content != null || message.Content != String.Empty))
                 {
                     // Create a WebSocket-based command context based on the message

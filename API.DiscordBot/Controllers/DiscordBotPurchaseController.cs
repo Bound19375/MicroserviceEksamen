@@ -1,11 +1,8 @@
-﻿using AutoMapper;
+﻿using Crosscutting.SellixPayload;
+using DiscordBot.Application.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Linq;
-using Crosscutting.SellixPayload;
-using DiscordBot.Application.Interface;
 
 namespace API.DiscordBot.Controllers
 {

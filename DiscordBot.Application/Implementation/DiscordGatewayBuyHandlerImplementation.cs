@@ -1,24 +1,17 @@
-﻿using Auth.Database;
+﻿using Crosscutting.KafkaDto.Discord;
 using Crosscutting.SellixPayload;
-using Crosscutting.TransactionHandling;
 using DiscordBot.Application.Interface;
-using DiscordNetConsumers;
 using MassTransit;
-
 
 namespace DiscordBot.Application.Implementation
 {
     public class DiscordGatewayBuyHandlerImplementation : IDiscordGatewayBuyHandlerImplementation
     {
-        private readonly IUnitOfWork<AuthDbContext> _uoW;
-        private readonly IDiscordGatewayBuyHandlerRepository _handler;
         private readonly ITopicProducer<KafkaDiscordSagaMessageDto> _topicProducer;
 
 
-        public DiscordGatewayBuyHandlerImplementation(IUnitOfWork<AuthDbContext> uoW, IDiscordGatewayBuyHandlerRepository handler, ITopicProducer<KafkaDiscordSagaMessageDto> topicProducer)
+        public DiscordGatewayBuyHandlerImplementation(ITopicProducer<KafkaDiscordSagaMessageDto> topicProducer)
         {
-            _uoW = uoW;
-            _handler = handler;
             _topicProducer = topicProducer;
         }
 
@@ -26,19 +19,14 @@ namespace DiscordBot.Application.Implementation
         {
             try
             {
-                await _uoW.CreateTransaction(System.Data.IsolationLevel.Serializable);
-                var message = await _handler.OrderHandler(root);
-                await _uoW.Commit();
-
-                if (message.State == DiscordTransportMessageState.NotificationReady)
+                await _topicProducer.Produce(new KafkaDiscordSagaMessageDto
                 {
-                    await _topicProducer.Produce(message);
-                }
-
+                    Payload = root,
+                    State = DiscordTransportMessageState.LicenseGrantReady
+                });
             }
             catch (Exception ex)
             {
-                await _uoW.Rollback();
                 throw new Exception(ex.Message);
             }
         }

@@ -1,13 +1,11 @@
-﻿using Discord.WebSocket;
-using System.Configuration;
+﻿using Crosscutting;
+using Discord;
+using Discord.WebSocket;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
-using Crosscutting;
-using Discord;
-using Newtonsoft.Json;
-using Discord.Rest;
-using Microsoft.Extensions.Configuration;
-using System.Net.Http.Headers;
 
 namespace BoundBot.Services
 {
@@ -37,12 +35,12 @@ namespace BoundBot.Services
                 Model.DiscordId = guilduser.Id.ToString();
                 Model.Channel = command.Channel.Id.ToString();
                 Model.Command = command.CommandName;
-                
+
                 var roles = guilduser.Roles.Select(role => role.ToString()).ToList();
                 Model.Roles = roles.Count == 0 ? new List<string>() { "0000000000" } : roles;
             }
         }
-        
+
         public async Task SlashCommandHandler(SocketSlashCommand command)
         {
             // Let's add a switch statement for the command name so we can handle multiple commands in one event.
@@ -81,15 +79,15 @@ namespace BoundBot.Services
 
         private async Task Help(SocketSlashCommand command)
         {
-            string userCommands = 
+            string userCommands =
                 "`/purchase -- Get shop link & required information`" +
                 "\n`/updatediscord -- Updates Discord Role & Db Information`" +
                 "\n`/hwid + {option:hwid} -- Updates DbHwid`" +
-                "\n`/checkme -- Get Current Active Licenses`" + 
+                "\n`/checkme -- Get Current Active Licenses`" +
                 "\n" +
                 "\n";
-            
-            string staffCommands = 
+
+            string staffCommands =
                 "`/checkdb + {option:Iuser}`" +
                 "\n`/stafflicense + {option:hwid}`";
 
@@ -188,7 +186,7 @@ namespace BoundBot.Services
                 embedBuilder.ThumbnailUrl = "https://i.imgur.com/dxCVy9r.png";
                 if (resp.IsSuccessStatusCode)
                 {
-                    
+
                     embedBuilder.AddField("Update Discord",
                         $"\n{responseBody}");
                 }
@@ -215,7 +213,7 @@ namespace BoundBot.Services
 
                 RestModel restModel = new(command);
 
-               
+
 
                 restModel.Model.Hwid = (command.Data.Options.First().Value as string)!;
 
@@ -260,12 +258,12 @@ namespace BoundBot.Services
 
                 RestModel restModel = new(command);
 
-               HttpResponseMessage jwtResponseMessage = await client.PostAsJsonAsync($"/gateway/API/DiscordBot/JwtGenerate", restModel.Model);
+                HttpResponseMessage jwtResponseMessage = await client.PostAsJsonAsync($"/gateway/API/DiscordBot/JwtGenerate", restModel.Model);
                 var jwtResponseBody = await jwtResponseMessage.Content.ReadAsStringAsync();
 
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtResponseBody);
 
-                HttpResponseMessage resp = await client.GetAsync($"/gateway/API/DiscordBot/Query/CheckMe/{command.User.Username+ " % 23" + command.User.Discriminator}/{command.User.Id}");
+                HttpResponseMessage resp = await client.GetAsync($"/gateway/API/DiscordBot/Query/CheckMe/{command.User.Username + " % 23" + command.User.Discriminator}/{command.User.Id}");
 
                 var responseBody = await resp.Content.ReadAsStringAsync();
 
@@ -323,15 +321,15 @@ namespace BoundBot.Services
 
                     var options = command.Data.Options.First().Value as IUser;
 
-                    HttpResponseMessage jwtResponseMessage = await client.PostAsJsonAsync( $"/gateway/API/DiscordBot/JwtGenerate", restModel.Model);
+                    HttpResponseMessage jwtResponseMessage = await client.PostAsJsonAsync($"/gateway/API/DiscordBot/JwtGenerate", restModel.Model);
                     var jwtResponseBody = await jwtResponseMessage.Content.ReadAsStringAsync();
 
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtResponseBody);
 
-                    HttpResponseMessage resp = await client.GetAsync( $"/gateway/API/DiscordBot/Query/CheckDB/{options!.Username+ "%23" + options.Discriminator}/{options.Id}");
+                    HttpResponseMessage resp = await client.GetAsync($"/gateway/API/DiscordBot/Query/CheckDB/{options!.Username + "%23" + options.Discriminator}/{options.Id}");
                     var responseBody = await resp.Content.ReadAsStringAsync();
-                    
-                    
+
+
                     if (resp.IsSuccessStatusCode)
                     {
                         var authModels = JsonConvert.DeserializeObject<List<AuthModelDTO>>(responseBody);

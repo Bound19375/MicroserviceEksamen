@@ -1,7 +1,5 @@
-﻿using Auth.Database;
+﻿using Crosscutting;
 using DiscordBot.Application.Interface;
-using Crosscutting;
-using Crosscutting.TransactionHandling;
 
 namespace DiscordBot.Application.Implementation
 {

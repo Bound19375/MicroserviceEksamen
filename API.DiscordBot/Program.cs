@@ -1,19 +1,12 @@
-using System.Text;
 using Auth.Database;
 using Auth.Database.DbContextConfiguration;
 using Broker.MassTransitServiceCollection;
-using Confluent.Kafka;
 using Crosscutting.Configuration.AuthPolicyConfiguration;
 using Crosscutting.Configuration.JwtConfiguration;
 using Crosscutting.TransactionHandling;
 using DiscordBot.Application.Implementation;
 using DiscordBot.Application.Interface;
 using DiscordBot.Infrastructure;
-using DiscordNetConsumers;
-using MassTransit;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);

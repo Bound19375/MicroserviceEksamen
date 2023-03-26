@@ -15,7 +15,8 @@ public static class DbContextConfiguration
         {
             options.UseMySql(builder.GetConnectionString("BoundcoreMaster") ?? throw new InvalidOperationException(),
                 ServerVersion.AutoDetect(builder.GetConnectionString("BoundcoreMaster")) ?? throw new InvalidOperationException(),
-                x => {
+                x =>
+                {
 
                 });
         });

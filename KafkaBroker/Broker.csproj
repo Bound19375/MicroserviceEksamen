@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -25,12 +25,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Crosscutting\Crosscutting.csproj" />
-    <ProjectReference Include="..\DiscordNetConsumers\DiscordNetConsumers.csproj" />
+    <Folder Include="MassTransitServiceCollection\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="MassTransitServiceCollection\" />
+	  <ProjectReference Include="..\DiscordBot.Application\DiscordBot.Application.csproj" />
+	  <ProjectReference Include="..\DiscordBot.Infrastructure\DiscordBot.Infrastructure.csproj" />
+	  <ProjectReference Include="..\DiscordSaga\DiscordSaga.csproj" />
   </ItemGroup>
 
 </Project>

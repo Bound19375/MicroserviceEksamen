@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Crosscutting;
 using System.ComponentModel.DataAnnotations;
-using Crosscutting;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Auth.Database.Model
 {

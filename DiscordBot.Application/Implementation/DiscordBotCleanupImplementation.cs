@@ -1,7 +1,6 @@
 ﻿using Auth.Database;
 using Crosscutting.TransactionHandling;
 using DiscordBot.Application.Interface;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Application.Implementation;
@@ -26,10 +25,10 @@ public class DiscordBotCleanupImplementation : IDiscordBotCleanupImplementation
             await _repository.CleanUp();
             await _unitOfWork.Commit();
         }
-        catch (Exception ex) 
-        { 
-            _logger.LogInformation(ex.Message); 
-            await _unitOfWork.Rollback(); 
+        catch (Exception ex)
+        {
+            _logger.LogInformation(ex.Message);
+            await _unitOfWork.Rollback();
         }
     }
 }

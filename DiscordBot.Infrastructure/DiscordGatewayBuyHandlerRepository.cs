@@ -1,11 +1,11 @@
 ﻿using Auth.Database;
 using Auth.Database.Model;
-using DiscordNetConsumers;
 using Crosscutting;
-using DiscordBot.Application.Interface;
-using Microsoft.Extensions.Logging;
+using Crosscutting.KafkaDto.Discord;
 using Crosscutting.SellixPayload;
+using DiscordBot.Application.Interface;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Infrastructure
 {
@@ -148,6 +148,8 @@ namespace DiscordBot.Infrastructure
                         WhichSpec = whichSpec,
                         State = DiscordTransportMessageState.NotificationReady
                     };
+
+                    return message;
                 }
             }
             catch (Exception ex)
@@ -155,7 +157,8 @@ namespace DiscordBot.Infrastructure
                 throw new Exception(ex.Message);
             }
 
-            return new KafkaDiscordSagaMessageDto {
+            return new KafkaDiscordSagaMessageDto
+            {
                 State = DiscordTransportMessageState.Failed
             };
         }

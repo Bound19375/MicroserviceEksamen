@@ -19,7 +19,6 @@
     <ProjectReference Include="..\BoundBot\BoundBot.csproj" />
     <ProjectReference Include="..\Crosscutting\Crosscutting.csproj" />
     <ProjectReference Include="..\DiscordBot.Application\DiscordBot.Application.csproj" />
-    <ProjectReference Include="..\KafkaBroker\Broker.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,12 +1,7 @@
 ﻿using Auth.Database;
-using DiscordBot.Application.Interface;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Crosscutting;
 using Crosscutting.TransactionHandling;
+using DiscordBot.Application.Interface;
 
 namespace DiscordBot.Application.Implementation
 {
@@ -29,10 +24,10 @@ namespace DiscordBot.Application.Implementation
                 await _UoW.Commit();
                 return result;
             }
-            catch (Exception ex) 
-            { 
+            catch (Exception ex)
+            {
                 await _UoW.Rollback();
-                throw new Exception(ex.Message); 
+                throw new Exception(ex.Message);
             }
         }
 
@@ -52,7 +47,7 @@ namespace DiscordBot.Application.Implementation
             }
         }
 
-        async Task<string> IDiscordBotCommandImplementation.UpdateHWID(DiscordModelDto model)
+        async Task<string> IDiscordBotCommandImplementation.UpdateHwid(DiscordModelDto model)
         {
             try
             {

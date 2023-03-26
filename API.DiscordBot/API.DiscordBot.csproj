@@ -28,10 +28,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Auth.Database\Auth.Database.csproj" />
     <ProjectReference Include="..\Crosscutting\Crosscutting.csproj" />
+    <ProjectReference Include="..\DiscordBot.Application\DiscordBot.Application.csproj" />
     <ProjectReference Include="..\DiscordBot.Infrastructure\DiscordBot.Infrastructure.csproj" />
-    <ProjectReference Include="..\DiscordNetConsumers\DiscordNetConsumers.csproj" />
     <ProjectReference Include="..\KafkaBroker\Broker.csproj" />
   </ItemGroup>
 

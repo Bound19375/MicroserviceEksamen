@@ -1,16 +1,11 @@
 using Auth.Application.Implementation;
 using Auth.Application.Interface;
 using Auth.Database;
-using Auth.Infrastructure;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Auth.Database.DbContextConfiguration;
+using Auth.Infrastructure;
 using Crosscutting.Configuration.AuthPolicyConfiguration;
-using Crosscutting.TransactionHandling;
-using MassTransit;
 using Crosscutting.Configuration.JwtConfiguration;
+using Crosscutting.TransactionHandling;
 
 var builder = WebApplication.CreateBuilder(args);
 

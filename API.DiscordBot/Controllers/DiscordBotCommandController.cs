@@ -54,7 +54,7 @@ namespace API.DiscordBot.Controllers
         {
             try
             {
-                var result = await _discord.UpdateHWID(model);
+                var result = await _discord.UpdateHwid(model);
                 return Ok(result);
             }
             catch (Exception ex)

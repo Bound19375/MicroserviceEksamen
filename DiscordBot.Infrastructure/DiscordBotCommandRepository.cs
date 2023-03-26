@@ -1,15 +1,14 @@
 ﻿using Auth.Database;
 using Auth.Database.Model;
+using Crosscutting;
+using Crosscutting.DiscordConnectionHandler.DiscordClientLibrary;
 using Discord;
-using Discord.Rest;
 using Discord.WebSocket;
 using DiscordBot.Application.Interface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Text;
-using Crosscutting;
-using Crosscutting.DiscordConnectionHandler.DiscordClientLibrary;
 
 namespace DiscordBot.Infrastructure
 {
@@ -33,7 +32,7 @@ namespace DiscordBot.Infrastructure
             {
                 _logger.LogInformation(model.DiscordUsername + " Engaged GetStaffLicense At: " + DateTime.UtcNow);
 
-                var check = await _db.ActiveLicenses.Include(user => user.User).Include(order=>order.Order).Where(x => x.User.DiscordId == model.DiscordId || x.User.DiscordUsername == model.DiscordUsername).ToListAsync();
+                var check = await _db.ActiveLicenses.Include(user => user.User).Include(order => order.Order).Where(x => x.User.DiscordId == model.DiscordId || x.User.DiscordUsername == model.DiscordUsername).ToListAsync();
                 var userExists = await _db.User!.FirstOrDefaultAsync(x => x.DiscordId == model.DiscordId && x.DiscordUsername == model.DiscordUsername);
 
                 if (check.Any())
@@ -116,19 +115,19 @@ namespace DiscordBot.Infrastructure
 
                 var check = await _db.ActiveLicenses.Include(user => user.User).Where(x => x.User.DiscordId == model.DiscordId || x.User.DiscordUsername == model.DiscordUsername).ToListAsync();
                 var makeCheck = await _db.MakeDatabase.Where(discord => discord.DiscordID == model.DiscordId || discord.DiscordUsername == model.DiscordUsername).ToListAsync();
-                
+
                 if (!check.Any() && !makeCheck.Any()) { throw new Exception($"{model.DiscordUsername} doesn't exist in the database"); }
 
                 int activeLicenses = check.Count(item => item.EndDate < DateTime.UtcNow) + makeCheck.Count();
 
-                if (activeLicenses >= 0) 
+                if (activeLicenses >= 0)
                 {
                     var guild = _client.GetGuild(ulong.Parse(_configuration["Discord:Guid"]!));
                     var clientUser = await _client.GetUserAsync(ulong.Parse(model.DiscordId));
 
                     IGuildUser? guildUser = null;
-                    if (guild != null) 
-                    { 
+                    if (guild != null)
+                    {
                         guildUser = guild.GetUser(clientUser.Id);
                     }
 
@@ -177,14 +176,14 @@ namespace DiscordBot.Infrastructure
             {
                 _logger.LogInformation(model.DiscordId + " Engaged UpdateHwid At: " + DateTime.UtcNow);
 
-                var check = await _db.ActiveLicenses.Include(user=>user.User).Include(order=>order.Order).Where(x=>x.User.DiscordId == model.DiscordId || x.User.DiscordUsername == model.DiscordUsername).ToListAsync();
+                var check = await _db.ActiveLicenses.Include(user => user.User).Include(order => order.Order).Where(x => x.User.DiscordId == model.DiscordId || x.User.DiscordUsername == model.DiscordUsername).ToListAsync();
 
                 //if (!check.Any()) { throw new Exception($"{model.DiscordUsername} doesn't exist in the database"); }
 
                 int activeLicenses = 0;
 
                 foreach (var item in check)
-                { 
+                {
                     if (item.EndDate < DateTime.UtcNow) { activeLicenses++; }
                 }
 
@@ -210,7 +209,7 @@ namespace DiscordBot.Infrastructure
 
                 foreach (var item in Deprecatedcheck)
                 {
-                    item.HWID= model.Hwid;
+                    item.HWID = model.Hwid;
 
                     builder.AppendLine(item.OrderID);
 
@@ -222,9 +221,9 @@ namespace DiscordBot.Infrastructure
                 return await Task.FromResult("Hwid & Roles Updated License(s):" +
                     $"\n{builder}");
             }
-            catch (Exception ex) 
-            { 
-                throw new Exception(ex.Message); 
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
     }
