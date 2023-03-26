@@ -5,6 +5,6 @@ namespace DiscordBot.Application.Interface
 {
     public interface IDiscordGatewayBuyHandlerRepository
     {
-        Task<KafkaDiscordSagaMessageDto> OrderHandler(SellixPayloadNormal.Root root);
+        Task<LicenseNotificationEvent> OrderHandler(SellixPayloadNormal.Root root);
     }
 }

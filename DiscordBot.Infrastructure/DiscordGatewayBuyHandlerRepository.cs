@@ -20,7 +20,7 @@ namespace DiscordBot.Infrastructure
             _logger = logger;
         }
 
-        async Task<KafkaDiscordSagaMessageDto> IDiscordGatewayBuyHandlerRepository.OrderHandler(SellixPayloadNormal.Root root)
+        async Task<LicenseNotificationEvent> IDiscordGatewayBuyHandlerRepository.OrderHandler(SellixPayloadNormal.Root root)
         {
             try
             {
@@ -140,13 +140,12 @@ namespace DiscordBot.Infrastructure
                     await _db.ActiveLicenses!.AddAsync(licenses);
                     await _db.SaveChangesAsync();
 
-                    var message = new KafkaDiscordSagaMessageDto
+                    var message = new LicenseNotificationEvent
                     {
                         Payload = root,
                         Quantity = quantity,
                         Time = time,
                         WhichSpec = whichSpec,
-                        State = DiscordTransportMessageState.NotificationReady
                     };
 
                     return message;
@@ -157,10 +156,7 @@ namespace DiscordBot.Infrastructure
                 throw new Exception(ex.Message);
             }
 
-            return new KafkaDiscordSagaMessageDto
-            {
-                State = DiscordTransportMessageState.Failed
-            };
+            throw new Exception("Unknown Error In GrantLicense");
         }
     }
 }

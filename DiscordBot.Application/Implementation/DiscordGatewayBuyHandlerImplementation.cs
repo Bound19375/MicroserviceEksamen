@@ -7,10 +7,10 @@ namespace DiscordBot.Application.Implementation
 {
     public class DiscordGatewayBuyHandlerImplementation : IDiscordGatewayBuyHandlerImplementation
     {
-        private readonly ITopicProducer<KafkaDiscordSagaMessageDto> _topicProducer;
+        private readonly ITopicProducer<LicenseNotificationEvent> _topicProducer;
 
 
-        public DiscordGatewayBuyHandlerImplementation(ITopicProducer<KafkaDiscordSagaMessageDto> topicProducer)
+        public DiscordGatewayBuyHandlerImplementation(ITopicProducer<LicenseNotificationEvent> topicProducer)
         {
             _topicProducer = topicProducer;
         }
@@ -19,10 +19,10 @@ namespace DiscordBot.Application.Implementation
         {
             try
             {
-                await _topicProducer.Produce(new KafkaDiscordSagaMessageDto
+                await _topicProducer.Produce(new LicenseGrantedEvent
                 {
-                    Payload = root,
-                    State = DiscordTransportMessageState.LicenseGrantReady
+                    CorrelationId = Guid.NewGuid(),
+                    Payload = root
                 });
             }
             catch (Exception ex)

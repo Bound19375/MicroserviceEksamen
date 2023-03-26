@@ -5,67 +5,63 @@ using Microsoft.Extensions.Logging;
 using System.Data;
 using Crosscutting.KafkaDto.Discord;
 using DiscordBot.Application.Interface;
+using Crosscutting.SellixPayload;
+using Crosscutting;
 
 namespace DiscordSaga
 {
-    public class KafkaDiscordSagaState : SagaStateMachineInstance, CorrelatedBy<Guid>
+    public class LicenseState : SagaStateMachineInstance
     {
         public Guid CorrelationId { get; set; }
-        public KafkaDiscordSagaMessageDto? Message { get; set; }
-        public SagaState State { get; set; } 
+
+        public SellixPayloadNormal.Root? Payload { get; set; }
+        public int? Quantity { get; set; }
+        public DateTime Time { get; set; }
+        public WhichSpec? WhichSpec { get; set; }
+
+        public string CurrentState { get; set; }
     }
 
-    public enum SagaState
+    public class LicenseStateMachine : MassTransitStateMachine<LicenseState>
     {
-        LicenseReady,
-        NotificationReady,
-    }
+        public State Granted { get; private set; }
 
-    public class KafkaDiscordSagaStateMachine : MassTransitStateMachine<KafkaDiscordSagaState>
-    {
-        public State? LicenseReady { get; private set; }
-        public State? NotificationReady { get; private set; }
+        public Event<LicenseGrantEvent> LicenseGranted { get; private set; }
+        public Event<LicenseNotificationEvent> Notify { get; private set; }
 
-        public Event<KafkaDiscordSagaState>? NotificationReadyEvent { get; private set; }
-        public Event<KafkaDiscordSagaState>? LicenseGrantReadyEvent { get; private set; }
-
-        public KafkaDiscordSagaStateMachine()
+        public LicenseStateMachine()
         {
-            InstanceState(x => (int)x.State, LicenseReady, NotificationReady);
+            Event(() => LicenseGranted, x => x.CorrelateById(context => context.Message.CorrelationId));
+            Event(() => Notify, x => x.CorrelateById(context => context.Message.CorrelationId));
 
-            Event(() => NotificationReadyEvent, x => x.CorrelateById(context => context.Message.CorrelationId));
-            Event(() => LicenseGrantReadyEvent, x => x.CorrelateById(context => context.Message.CorrelationId));
+            InstanceState(x => x.CurrentState);
 
             Initially(
-                When(LicenseGrantReadyEvent)
+                When(LicenseGranted)
                     .Then(context =>
                     {
-                        context.Saga.Message = context.Message.Message;
-                        context.Saga.State = SagaState.LicenseReady;
+                        context.Saga.Payload = context.Saga.Payload;
+                        context.Saga.Quantity = null;
+                        context.Saga.Time = default;
+                        context.Saga.WhichSpec = null;
                     })
-                    //RabbitMq
-                    .Publish(context => new KafkaDiscordSagaState
-                    {
-                        CorrelationId = context.Saga.CorrelationId,
-                        Message = context.Saga.Message,
-                        State = context.Saga.State = SagaState.LicenseReady
-                    })
-                    //Kafka
-                    .Produce(context => context.Init<KafkaDiscordSagaState>(new
-                    {
-                        CorrelationId = context.Saga.CorrelationId,
-                        Message = context.Saga.Message,
-                        State = context.Saga.State = SagaState.LicenseReady
-                    }))
-                    .TransitionTo(NotificationReady)
+                    .TransitionTo(Granted)
             );
 
-            During(NotificationReady,
-                When(NotificationReadyEvent)
+            During(Granted,
+                When(Notify)
                     .Then(context =>
                     {
-                        context.Saga.Message = context.Saga.Message;
-                        context.Saga.State = SagaState.NotificationReady;
+                        context.Saga.Quantity = context.Saga.Quantity;
+                        context.Saga.Time = context.Saga.Time;
+                        context.Saga.WhichSpec = context.Saga.WhichSpec;
+                    })
+                    .Publish(context => new LicenseNotificationEvent
+                    {
+                        Payload = context.Saga.Payload,
+                        Quantity = context.Saga.Quantity,
+                        Time = context.Saga.Time,
+                        WhichSpec = context.Saga.WhichSpec
                     })
                     .Finalize()
             );
@@ -74,65 +70,88 @@ namespace DiscordSaga
         }
     }
 
-    public class DiscordSagaConsumer : ISaga, InitiatedByOrOrchestrates<KafkaDiscordSagaState>
+    public class GrantLicenseConsumer : IConsumer<LicenseGrantEvent>
     {
-        private readonly ILogger<DiscordSagaConsumer> _logger;
-        private readonly IDiscordBotNotificationRepository _botNotification;
-        private readonly IUnitOfWork<AuthDbContext> _authDbContext;
-        private readonly IDiscordGatewayBuyHandlerRepository _buyHandler;
-
-        public DiscordSagaConsumer(ILogger<DiscordSagaConsumer> logger, IDiscordBotNotificationRepository botNotification, IUnitOfWork<AuthDbContext> authDbContext, IDiscordGatewayBuyHandlerRepository buyHandler)
+        private readonly ILogger<GrantLicenseConsumer> _logger;
+        private readonly IUnitOfWork<AuthDbContext> _unitOfWork;
+        private readonly IDiscordGatewayBuyHandlerRepository _license;
+        public GrantLicenseConsumer(ILogger<GrantLicenseConsumer> logger, IDiscordGatewayBuyHandlerRepository license, IUnitOfWork<AuthDbContext> unitOfWork)
         {
             _logger = logger;
-            _botNotification = botNotification;
-            _authDbContext = authDbContext;
-            _buyHandler = buyHandler;
+            _license = license;
+            _unitOfWork = unitOfWork;
         }
 
-        public Guid CorrelationId { get; set; }
-
-        public async Task Consume(ConsumeContext<KafkaDiscordSagaState> context)
+        public async Task Consume(ConsumeContext<LicenseGrantEvent> context)
         {
             try
             {
-                switch (context.Message.State)
+                _logger.LogInformation("Received GrantLicense command with payload: {Payload}", context.Message.Payload);
+
+                await _unitOfWork.CreateTransaction(IsolationLevel.Serializable);
+                if (context.Message.Payload != null)
                 {
-                    case SagaState.LicenseReady:
-                        try
-                        {
-                            _logger.LogInformation("LicenseGrant Consumer Executed: " + context.Message);
+                    var license = await _license.OrderHandler(context.Message.Payload);
 
-                            if (context.Message.Message != null)
-                            {
-                                if (context.Message.Message.Payload != null)
-                                {
-                                    await _authDbContext.CreateTransaction(IsolationLevel.Serializable);
-                                    await _buyHandler.OrderHandler(context.Message.Message.Payload);
-                                }
-                            }
+                    await _unitOfWork.Commit();
 
-                            await _authDbContext.Commit();
-                        }
-                        catch (Exception ex)
-                        {
-                            await _authDbContext.Rollback();
-                            _logger.LogError(ex.Message);
-                        }
-                        break;
+                    // Update the state machine instance with the returned values
+                    var stateMachineInstance = context.GetPayload<LicenseState>();
+                    stateMachineInstance.Payload = context.Message.Payload;
+                    stateMachineInstance.Quantity = license.Quantity;
+                    stateMachineInstance.Time = license.Time;
+                    stateMachineInstance.WhichSpec = license.WhichSpec;
 
-                    case SagaState.NotificationReady:
-                        _logger.LogInformation("NotificationReady Consumer Executed: " + context.Message);
-                        if (context.Message.Message != null)
-                            await _botNotification.NotificationHandler(context.Message.Message);
-                        break;
+                    await context.Publish(new LicenseNotificationEvent
+                    {
+                        Payload = license.Payload,
+                        Quantity = license.Quantity,
+                        Time = license.Time,
+                        WhichSpec = license.WhichSpec
+                    });
 
-                    default:
-                        throw new ArgumentOutOfRangeException();
+                    _logger.LogInformation("Published Notify event with CorrelationId: {CorrelationId}", stateMachineInstance.CorrelationId);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                _logger.LogError(ex, "License Consumer Error");
+            }
+        }
+    }
+
+    public class NotifyConsumer : IConsumer<LicenseNotificationEvent>
+    {
+        private readonly ILogger<NotifyConsumer> _logger;
+        private readonly IDiscordBotNotificationRepository _botNotificationRepository;
+
+        public NotifyConsumer(ILogger<NotifyConsumer> logger, IDiscordBotNotificationRepository botNotificationRepository)
+        {
+            _logger = logger;
+            _botNotificationRepository = botNotificationRepository;
+        }
+
+        public async Task Consume(ConsumeContext<LicenseNotificationEvent> context)
+        {
+            try
+            {
+                _logger.LogInformation("Received Notify event with CorrelationId: {CorrelationId}", context.Message.CorrelationId);
+
+                // Perform some business logic to send the notification
+                await _botNotificationRepository.NotificationHandler(new LicenseNotificationEvent
+                {
+                    Payload = context.Message.Payload,
+                    Quantity = context.Message.Quantity,
+                    Time = context.Message.Time,
+                    WhichSpec = context.Message.WhichSpec
+                });
+
+                _logger.LogInformation("Sent notification with Quantity: {Quantity}, Time: {Time}, WhichSpec: {WhichSpec}",
+                    context.Message.Quantity, context.Message.Time, context.Message.WhichSpec);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Notification Error");
             }
         }
     }

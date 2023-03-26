@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Auth.Database\Auth.Database.csproj" />
-    <ProjectReference Include="..\Crosscutting\Crosscutting.csproj" />
+	  <ProjectReference Include="..\Crosscutting\Crosscutting.csproj" />
   </ItemGroup>
 
 </Project>

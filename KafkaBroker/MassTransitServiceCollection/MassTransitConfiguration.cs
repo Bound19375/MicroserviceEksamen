@@ -31,26 +31,28 @@ public static class MassTransitConfiguration
 
             x.AddRider(r =>
             {
-                r.AddConsumer<DiscordSagaConsumer>();
+                r.AddConsumer<GrantLicenseConsumer>();
+                r.AddConsumer<NotifyConsumer>();
 
-                r.AddProducer<KafkaDiscordSagaMessageDto>("Discord-License-Notification");
+                r.AddProducer<LicenseNotificationEvent>("Discord-License-Notification");
 
-                r.AddSagaStateMachine<KafkaDiscordSagaStateMachine, KafkaDiscordSagaState>();
+                r.AddSagaStateMachine<LicenseStateMachine, LicenseState>();
 
                 r.UsingKafka((context, cfg) =>
                 {
 
                     cfg.Host("kafka");
 
-                    cfg.TopicEndpoint<KafkaDiscordSagaMessageDto>("Discord-License-Notification", "Discord", e =>
+                    cfg.TopicEndpoint<LicenseNotificationEvent>("Discord-License-Notification", "Discord", e =>
                     {
                         e.CreateIfMissing(p => p.NumPartitions = 1);
                         e.AutoOffsetReset = AutoOffsetReset.Earliest;
-                        e.ConfigureConsumer<DiscordSagaConsumer>(context);
+                        e.ConfigureConsumer<GrantLicenseConsumer>(context);
                         e.UseMessageRetry(c => c.Interval(3, TimeSpan.FromSeconds(10)));
-
-                        e.ConfigureSaga<KafkaDiscordSagaState>(context);
-
+                        e.ConfigureConsumer<NotifyConsumer>(context);
+                        e.UseMessageRetry(c => c.Interval(3, TimeSpan.FromSeconds(10)));
+                        
+                        e.ConfigureSaga<LicenseState>(context);
                     });
                 });
             });

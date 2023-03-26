@@ -21,7 +21,7 @@ public class DiscordBotNotificationRepository : IDiscordBotNotificationRepositor
         _configuration = configuration;
     }
 
-    async Task IDiscordBotNotificationRepository.NotificationHandler(KafkaDiscordSagaMessageDto context)
+    async Task IDiscordBotNotificationRepository.NotificationHandler(LicenseNotificationEvent context)
     {
         var clientUser = await _client.GetUserAsync(ulong.Parse(context.Payload!.Data.CustomFields.DiscordId));
 
