@@ -13,13 +13,11 @@ namespace DiscordSaga
     public class LicenseState : SagaStateMachineInstance
     {
         public Guid CorrelationId { get; set; }
-
         public SellixPayloadNormal.Root? Payload { get; set; }
         public int? Quantity { get; set; }
         public DateTime Time { get; set; }
         public WhichSpec? WhichSpec { get; set; }
-
-        public string CurrentState { get; set; }
+        public int CurrentState { get; set; }
     }
 
     public class LicenseStateMachine : MassTransitStateMachine<LicenseState>
@@ -34,16 +32,13 @@ namespace DiscordSaga
             Event(() => LicenseGranted, x => x.CorrelateById(context => context.Message.CorrelationId));
             Event(() => Notify, x => x.CorrelateById(context => context.Message.CorrelationId));
 
-            InstanceState(x => x.CurrentState);
+            InstanceState(x => x.CurrentState, Initial, Granted, Final);
 
             Initially(
                 When(LicenseGranted)
                     .Then(context =>
                     {
-                        context.Saga.Payload = context.Saga.Payload;
-                        context.Saga.Quantity = null;
-                        context.Saga.Time = default;
-                        context.Saga.WhichSpec = null;
+                        context.Saga.Payload = context.Message.Payload;
                     })
                     .TransitionTo(Granted)
             );
@@ -52,16 +47,16 @@ namespace DiscordSaga
                 When(Notify)
                     .Then(context =>
                     {
-                        context.Saga.Quantity = context.Saga.Quantity;
-                        context.Saga.Time = context.Saga.Time;
-                        context.Saga.WhichSpec = context.Saga.WhichSpec;
+                        context.Saga.Quantity = context.Message.Quantity;
+                        context.Saga.Time = context.Message.Time;
+                        context.Saga.WhichSpec = context.Message.WhichSpec;
                     })
                     .Publish(context => new LicenseNotificationEvent
                     {
                         Payload = context.Saga.Payload,
                         Quantity = context.Saga.Quantity,
                         Time = context.Saga.Time,
-                        WhichSpec = context.Saga.WhichSpec
+                        WhichSpec = context.Saga.WhichSpec,
                     })
                     .Finalize()
             );
@@ -95,22 +90,16 @@ namespace DiscordSaga
 
                     await _unitOfWork.Commit();
 
-                    // Update the state machine instance with the returned values
-                    var stateMachineInstance = context.GetPayload<LicenseState>();
-                    stateMachineInstance.Payload = context.Message.Payload;
-                    stateMachineInstance.Quantity = license.Quantity;
-                    stateMachineInstance.Time = license.Time;
-                    stateMachineInstance.WhichSpec = license.WhichSpec;
-
                     await context.Publish(new LicenseNotificationEvent
                     {
                         Payload = license.Payload,
                         Quantity = license.Quantity,
                         Time = license.Time,
-                        WhichSpec = license.WhichSpec
+                        WhichSpec = license.WhichSpec,
+                        CorrelationId = context.Message.CorrelationId,
                     });
 
-                    _logger.LogInformation("Published Notify event with CorrelationId: {CorrelationId}", stateMachineInstance.CorrelationId);
+                    _logger.LogInformation("Published Notify event with CorrelationId: {CorrelationId}", context.Message.CorrelationId);
                 }
             }
             catch (Exception ex)
