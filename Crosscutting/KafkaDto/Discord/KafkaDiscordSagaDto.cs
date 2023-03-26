@@ -3,7 +3,7 @@ using MassTransit;
 
 namespace Crosscutting.KafkaDto.Discord;
 
-    public class LicenseGrantedEvent : CorrelatedBy<Guid>
+    public class LicenseGrantEvent : CorrelatedBy<Guid>
     {
         public SellixPayloadNormal.Root? Payload { get; set; }
         public Guid CorrelationId { get; set; }

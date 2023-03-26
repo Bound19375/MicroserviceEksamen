@@ -19,7 +19,7 @@ namespace DiscordBot.Application.Implementation
         {
             try
             {
-                await _topicProducer.Produce(new LicenseGrantedEvent
+                await _topicProducer.Produce(new LicenseGrantEvent
                 {
                     CorrelationId = Guid.NewGuid(),
                     Payload = root
