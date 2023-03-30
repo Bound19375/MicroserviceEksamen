@@ -18,7 +18,7 @@ services:
       dockerfile: apigateway/Dockerfile
     volumes:
       - persistedData:/app/certs/
-      - ./Crosscutting/certs/:/app/certs/
+      - ./Crosscutting/certs:/app/certs/
 
   boundbot:
     image: ${DOCKER_REGISTRY-}boundbot
@@ -98,6 +98,7 @@ services:
     networks: 
       - private_network
     environment:
+      - ConnectionStrings__BoundcoreMaster=${ConnectionStrings__BoundcoreMaster}
       - RabbitMQ__User=${RabbitMQUser}
       - RabbitMQ__Pass=${RabbitMQPass}
     build:

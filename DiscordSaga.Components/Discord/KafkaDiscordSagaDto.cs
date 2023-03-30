@@ -2,7 +2,7 @@
 using Crosscutting.SellixPayload;
 using MassTransit;
 
-namespace DiscordSaga.Components.KafkaDto.Discord;
+namespace DiscordSaga.Components.Discord;
 
     public class LicenseGrantEvent : CorrelatedBy<Guid>
     {

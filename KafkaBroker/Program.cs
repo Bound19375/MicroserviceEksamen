@@ -1,4 +1,7 @@
+using Auth.Database;
+using Auth.Database.DbContextConfiguration;
 using Broker.MassTransitServiceCollection;
+using Crosscutting.TransactionHandling;
 using DiscordBot.Application.Interface;
 using DiscordBot.Infrastructure;
 using Serilog;
@@ -9,6 +12,9 @@ builder.Configuration.AddEnvironmentVariables();
 
 builder.Logging.ClearProviders().AddSerilog().AddConsole();
 
+builder.Services.AddMasterDbContext(builder.Configuration);
+
+builder.Services.AddScoped<IUnitOfWork<AuthDbContext>, UnitOfWork<AuthDbContext>>();
 builder.Services.AddScoped<IDiscordBotNotificationRepository, DiscordBotNotificationRepository>();
 builder.Services.AddScoped<IDiscordGatewayBuyHandlerRepository, DiscordGatewayBuyHandlerRepository>();
 

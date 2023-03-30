@@ -3,7 +3,7 @@ using Auth.Database.Model;
 using Crosscutting;
 using Crosscutting.SellixPayload;
 using DiscordBot.Application.Interface;
-using DiscordSaga.Components.KafkaDto.Discord;
+using DiscordSaga.Components.Discord;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 

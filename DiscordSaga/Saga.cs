@@ -6,7 +6,7 @@ using System.Data;
 using DiscordBot.Application.Interface;
 using Crosscutting;
 using Crosscutting.SellixPayload;
-using DiscordSaga.Components.KafkaDto.Discord;
+using DiscordSaga.Components.Discord;
 
 namespace DiscordSaga
 {
@@ -22,12 +22,23 @@ namespace DiscordSaga
 
     public class LicenseStateMachine : MassTransitStateMachine<LicenseState>
     {
+        private readonly ILogger<LicenseStateMachine> _logger;
+        private readonly IDiscordBotNotificationRepository _botNotificationRepository;
+        private readonly IUnitOfWork<AuthDbContext> _unitOfWork;
+        private readonly IDiscordGatewayBuyHandlerRepository _license;
+
+        
         public State Granted { get; private set; }
         public Event<LicenseGrantEvent> LicenseGranted { get; private set; }
         public Event<LicenseNotificationEvent> Notify { get; private set; }
 
-        public LicenseStateMachine()
+        public LicenseStateMachine(ILogger<LicenseStateMachine> logger, IDiscordBotNotificationRepository botNotificationRepository, IUnitOfWork<AuthDbContext> unitOfWork, IDiscordGatewayBuyHandlerRepository license)
         {
+            _logger = logger;
+            _botNotificationRepository = botNotificationRepository;
+            _unitOfWork = unitOfWork;
+            _license = license;
+
             Event(() => LicenseGranted, x => x.CorrelateById(context => context.Message.CorrelationId));
             Event(() => Notify, x => x.CorrelateById(context => context.Message.CorrelationId));
 
@@ -35,27 +46,52 @@ namespace DiscordSaga
 
             Initially(
                 When(LicenseGranted)
-                    .Then(context =>
+                    .Then(context => _logger.LogInformation("Received GrantLicense command with payload: {Payload}", context.Message.Payload))
+                    .ThenAsync(async context =>
                     {
-                        context.Saga.Payload = context.Message.Payload;
+                        await _unitOfWork.CreateTransaction(IsolationLevel.Serializable);
+                        if (context.Message.Payload != null)
+                        {
+                            var licenseResponse = await _license.OrderHandler(context.Message.Payload);
+
+                            await _unitOfWork.Commit();
+
+                            context.Saga.Payload = licenseResponse.Payload;
+                            context.Saga.Quantity = licenseResponse.Quantity;
+                            context.Saga.Time = licenseResponse.Time;
+                            context.Saga.WhichSpec = licenseResponse.WhichSpec;
+
+                            await context.Publish(new LicenseNotificationEvent
+                            {
+                                Payload = licenseResponse.Payload,
+                                Quantity = licenseResponse.Quantity,
+                                Time = licenseResponse.Time,
+                                WhichSpec = licenseResponse.WhichSpec,
+                                CorrelationId = context.Data.CorrelationId,
+                            });
+
+                            _logger.LogInformation("Published Notify event with CorrelationId: {CorrelationId}", context.Message.CorrelationId);
+                        }
                     })
                     .TransitionTo(Granted)
             );
 
             During(Granted,
                 When(Notify)
-                    .Then(context =>
+                    .Then(context => _logger.LogInformation("Received Notify event with CorrelationId: {CorrelationId}", context.Message.CorrelationId))
+                    .ThenAsync(async context =>
                     {
-                        context.Saga.Quantity = context.Message.Quantity;
-                        context.Saga.Time = context.Message.Time;
-                        context.Saga.WhichSpec = context.Message.WhichSpec;
-                    })
-                    .Publish(context => new LicenseNotificationEvent
-                    {
-                        Payload = context.Saga.Payload,
-                        Quantity = context.Saga.Quantity,
-                        Time = context.Saga.Time,
-                        WhichSpec = context.Saga.WhichSpec,
+                        // Perform some business logic to send the notification
+                        await _botNotificationRepository.NotificationHandler(new LicenseNotificationEvent
+                        {
+                            Payload = context.Message.Payload,
+                            Quantity = context.Message.Quantity,
+                            Time = context.Message.Time,
+                            WhichSpec = context.Message.WhichSpec
+                        });
+
+                        _logger.LogInformation("Sent notification with Quantity: {Quantity}, Time: {Time}, WhichSpec: {WhichSpec}",
+                            context.Message.Quantity, context.Message.Time, context.Message.WhichSpec);
                     })
                     .Finalize()
             );
@@ -64,88 +100,81 @@ namespace DiscordSaga
         }
     }
 
-    public class GrantLicenseConsumer : IConsumer<LicenseGrantEvent>
-    {
-        private readonly ILogger<GrantLicenseConsumer> _logger;
-        private readonly IUnitOfWork<AuthDbContext> _unitOfWork;
-        private readonly IDiscordGatewayBuyHandlerRepository _license;
-        public GrantLicenseConsumer(ILogger<GrantLicenseConsumer> logger, IDiscordGatewayBuyHandlerRepository license, IUnitOfWork<AuthDbContext> unitOfWork)
-        {
-            _logger = logger;
-            _license = license;
-            _unitOfWork = unitOfWork;
-        }
+    //public class DiscordPurchaseNotificationSaga : ISaga, InitiatedBy<LicenseGrantEvent>, Orchestrates<LicenseNotificationEvent>
+    //{
+    //    public Guid CorrelationId { get; set; }
 
-        public async Task Consume(ConsumeContext<LicenseGrantEvent> context)
-        {
-            try
-            {
-                _logger.LogInformation("Received GrantLicense command with payload: {Payload}", context.Message.Payload);
+    //    private readonly ILogger<DiscordPurchaseNotificationSaga> _logger;
+    //    private readonly IDiscordBotNotificationRepository _botNotificationRepository;
+    //    private readonly IUnitOfWork<AuthDbContext> _unitOfWork;
+    //    private readonly IDiscordGatewayBuyHandlerRepository _license;
 
-                await _unitOfWork.CreateTransaction(IsolationLevel.Serializable);
-                if (context.Message.Payload != null)
-                {
-                    var license = await _license.OrderHandler(context.Message.Payload);
+    //    #pragma warning disable CS8618
+    //    public DiscordPurchaseNotificationSaga() {}
+    //    #pragma warning restore CS8618
 
-                    await _unitOfWork.Commit();
+    //    public DiscordPurchaseNotificationSaga(ILogger<DiscordPurchaseNotificationSaga> logger, IDiscordBotNotificationRepository botNotificationRepository, IUnitOfWork<AuthDbContext> unitOfWork, IDiscordGatewayBuyHandlerRepository license)
+    //    {
+    //        _logger = logger;
+    //        _botNotificationRepository = botNotificationRepository;
+    //        _unitOfWork = unitOfWork;
+    //        _license = license;
+    //    }
 
-                    await context.Publish(new LicenseNotificationEvent
-                    {
-                        Payload = license.Payload,
-                        Quantity = license.Quantity,
-                        Time = license.Time,
-                        WhichSpec = license.WhichSpec,
-                        CorrelationId = context.Message.CorrelationId,
-                    });
+    //    public async Task Consume(ConsumeContext<LicenseGrantEvent> context)
+    //    {
+    //        try
+    //        {
+    //            _logger.LogInformation("Received GrantLicense command with payload: {Payload}", context.Message.Payload);
 
-                    _logger.LogInformation("Published Notify event with CorrelationId: {CorrelationId}", context.Message.CorrelationId);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "License Consumer Error");
-            }
-        }
-    }
+    //            await _unitOfWork.CreateTransaction(IsolationLevel.Serializable);
+    //            if (context.Message.Payload != null)
+    //            {
+    //                var license = await _license.OrderHandler(context.Message.Payload);
 
-    public class NotifyConsumer : IConsumer<LicenseNotificationEvent>, ISaga, InitiatedByOrOrchestrates<LicenseNotificationEvent>
-    {
-        public Guid CorrelationId { get; set; }
+    //                await _unitOfWork.Commit();
 
-        private readonly ILogger<NotifyConsumer> _logger;
-        private readonly IDiscordBotNotificationRepository _botNotificationRepository;
+    //                await context.Publish(new LicenseNotificationEvent
+    //                {
+    //                    Payload = license.Payload,
+    //                    Quantity = license.Quantity,
+    //                    Time = license.Time,
+    //                    WhichSpec = license.WhichSpec,
+    //                    CorrelationId = context.Message.CorrelationId,
+    //                });
 
-        public NotifyConsumer(ILogger<NotifyConsumer> logger, IDiscordBotNotificationRepository botNotificationRepository)
-        {
-            _logger = logger;
-            _botNotificationRepository = botNotificationRepository;
-        }
+    //                _logger.LogInformation("Published Notify event with CorrelationId: {CorrelationId}", context.Message.CorrelationId);
+    //            }
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            _logger.LogError(ex, "License Consumer Error");
+    //        }
+    //    }
+    //    public async Task Consume(ConsumeContext<LicenseNotificationEvent> context)
+    //    {
+    //        try
+    //        {
+    //            _logger.LogInformation("Received Notify event with CorrelationId: {CorrelationId}", context.Message.CorrelationId);
 
-        public async Task Consume(ConsumeContext<LicenseNotificationEvent> context)
-        {
-            try
-            {
-                _logger.LogInformation("Received Notify event with CorrelationId: {CorrelationId}", context.Message.CorrelationId);
+    //            // Perform some business logic to send the notification
+    //            await _botNotificationRepository.NotificationHandler(new LicenseNotificationEvent
+    //            {
+    //                Payload = context.Message.Payload,
+    //                Quantity = context.Message.Quantity,
+    //                Time = context.Message.Time,
+    //                WhichSpec = context.Message.WhichSpec
+    //            });
 
-                // Perform some business logic to send the notification
-                await _botNotificationRepository.NotificationHandler(new LicenseNotificationEvent
-                {
-                    Payload = context.Message.Payload,
-                    Quantity = context.Message.Quantity,
-                    Time = context.Message.Time,
-                    WhichSpec = context.Message.WhichSpec
-                });
-
-                _logger.LogInformation("Sent notification with Quantity: {Quantity}, Time: {Time}, WhichSpec: {WhichSpec}",
-                    context.Message.Quantity, context.Message.Time, context.Message.WhichSpec);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Notification Error");
-            }
-        }
-
-    }
+    //            _logger.LogInformation("Sent notification with Quantity: {Quantity}, Time: {Time}, WhichSpec: {WhichSpec}",
+    //                context.Message.Quantity, context.Message.Time, context.Message.WhichSpec);
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            _logger.LogError(ex, "Notification Error");
+    //        }
+    //    }
+    //}
 }
 
 

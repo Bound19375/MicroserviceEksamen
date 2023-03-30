@@ -13,8 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net.Commands" Version="3.9.0" />
-    <PackageReference Include="Discord.Net.WebSocket" Version="3.9.0" />
+    <PackageReference Include="Discord.Net.Commands" Version="3.10.0" />
+    <PackageReference Include="Discord.Net.WebSocket" Version="3.10.0" />
     <PackageReference Include="IdentityServer4.Storage" Version="4.1.2" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.14" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.4" />

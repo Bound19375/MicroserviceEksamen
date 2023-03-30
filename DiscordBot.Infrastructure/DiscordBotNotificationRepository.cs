@@ -3,7 +3,7 @@ using Crosscutting.DiscordConnectionHandler.DiscordClientLibrary;
 using Discord;
 using Discord.WebSocket;
 using DiscordBot.Application.Interface;
-using DiscordSaga.Components.KafkaDto.Discord;
+using DiscordSaga.Components.Discord;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
