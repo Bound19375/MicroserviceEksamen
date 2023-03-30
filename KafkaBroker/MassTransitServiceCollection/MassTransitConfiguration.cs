@@ -1,6 +1,6 @@
 ﻿using Confluent.Kafka;
-using Crosscutting.KafkaDto.Discord;
 using DiscordSaga;
+using DiscordSaga.Components.KafkaDto.Discord;
 using MassTransit;
 using Serilog;
 

@@ -1,9 +1,9 @@
 ﻿using Crosscutting;
 using Crosscutting.DiscordConnectionHandler.DiscordClientLibrary;
-using Crosscutting.KafkaDto.Discord;
 using Discord;
 using Discord.WebSocket;
 using DiscordBot.Application.Interface;
+using DiscordSaga.Components.KafkaDto.Discord;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 

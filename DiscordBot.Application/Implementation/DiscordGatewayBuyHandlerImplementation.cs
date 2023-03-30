@@ -1,6 +1,6 @@
-﻿using Crosscutting.KafkaDto.Discord;
-using Crosscutting.SellixPayload;
+﻿using Crosscutting.SellixPayload;
 using DiscordBot.Application.Interface;
+using DiscordSaga.Components.KafkaDto.Discord;
 using MassTransit;
 
 namespace DiscordBot.Application.Implementation

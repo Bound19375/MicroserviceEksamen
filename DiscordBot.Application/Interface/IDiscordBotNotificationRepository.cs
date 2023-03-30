@@ -1,4 +1,4 @@
-﻿using Crosscutting.KafkaDto.Discord;
+﻿using DiscordSaga.Components.KafkaDto.Discord;
 
 namespace DiscordBot.Application.Interface;
 

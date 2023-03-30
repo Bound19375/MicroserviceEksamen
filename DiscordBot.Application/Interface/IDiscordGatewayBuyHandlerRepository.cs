@@ -1,5 +1,5 @@
-﻿using Crosscutting.KafkaDto.Discord;
-using Crosscutting.SellixPayload;
+﻿using Crosscutting.SellixPayload;
+using DiscordSaga.Components.KafkaDto.Discord;
 
 namespace DiscordBot.Application.Interface
 {

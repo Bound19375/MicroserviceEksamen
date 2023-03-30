@@ -3,10 +3,10 @@ using Crosscutting.TransactionHandling;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using System.Data;
-using Crosscutting.KafkaDto.Discord;
 using DiscordBot.Application.Interface;
 using Crosscutting.SellixPayload;
 using Crosscutting;
+using DiscordSaga.Components.KafkaDto.Discord;
 
 namespace DiscordSaga
 {
@@ -32,7 +32,7 @@ namespace DiscordSaga
             Event(() => LicenseGranted, x => x.CorrelateById(context => context.Message.CorrelationId));
             Event(() => Notify, x => x.CorrelateById(context => context.Message.CorrelationId));
 
-            InstanceState(x => x.CurrentState, Initial, Granted, Final);
+            InstanceState(x => x.CurrentState, Initial, Final, Granted);
 
             Initially(
                 When(LicenseGranted)
@@ -109,8 +109,10 @@ namespace DiscordSaga
         }
     }
 
-    public class NotifyConsumer : IConsumer<LicenseNotificationEvent>
+    public class NotifyConsumer : IConsumer<LicenseNotificationEvent>, ISaga, InitiatedByOrOrchestrates<LicenseNotificationEvent>
     {
+        public Guid CorrelationId { get; set; }
+
         private readonly ILogger<NotifyConsumer> _logger;
         private readonly IDiscordBotNotificationRepository _botNotificationRepository;
 
@@ -143,6 +145,7 @@ namespace DiscordSaga
                 _logger.LogError(ex, "Notification Error");
             }
         }
+
     }
 }
 
