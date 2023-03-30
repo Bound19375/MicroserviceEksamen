@@ -16,6 +16,7 @@
     <ProjectReference Include="..\..\DiscordSaga.Components\DiscordSaga.Components.csproj" />
     <ProjectReference Include="..\Auth.Database\Auth.Database.csproj" />
 	  <ProjectReference Include="..\Crosscutting\Crosscutting.csproj" />
+	  <ProjectReference Include="..\DiscordSaga.Components\DiscordSaga.Components.csproj" />
   </ItemGroup>
 
 </Project>

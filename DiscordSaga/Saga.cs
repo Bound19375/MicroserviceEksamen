@@ -4,8 +4,8 @@ using MassTransit;
 using Microsoft.Extensions.Logging;
 using System.Data;
 using DiscordBot.Application.Interface;
-using Crosscutting.SellixPayload;
 using Crosscutting;
+using Crosscutting.SellixPayload;
 using DiscordSaga.Components.KafkaDto.Discord;
 
 namespace DiscordSaga
@@ -23,7 +23,6 @@ namespace DiscordSaga
     public class LicenseStateMachine : MassTransitStateMachine<LicenseState>
     {
         public State Granted { get; private set; }
-
         public Event<LicenseGrantEvent> LicenseGranted { get; private set; }
         public Event<LicenseNotificationEvent> Notify { get; private set; }
 
