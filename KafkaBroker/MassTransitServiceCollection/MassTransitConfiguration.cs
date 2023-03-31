@@ -36,19 +36,26 @@ public static class MassTransitConfiguration
             x.AddRider(r =>
             {
                 r.AddSagaStateMachine<LicenseStateMachine, LicenseState>().InMemoryRepository(); //MongoDb
-                r.AddSaga<DiscordPurchaseNotificationSaga>().InMemoryRepository(); //MongoDb
+                r.AddSaga<DiscordSagaConsumer>().InMemoryRepository(); //MongoDb
 
-                r.AddProducer<LicenseGrantEvent>("Discord-License-Notification");
+                r.AddProducer<LicenseGrantEvent>("Discord-License");
 
                 r.UsingKafka((context, cfg) =>
                 {
                     cfg.Host("kafka");
 
-                    cfg.TopicEndpoint<LicenseGrantEvent>("Discord-License-Notification", "Discord", e =>
+                    cfg.TopicEndpoint<Null,LicenseGrantEvent>("Discord-License", "Discord", e =>
                     {
                         e.CreateIfMissing(p => p.NumPartitions = 1);
                         e.AutoOffsetReset = AutoOffsetReset.Earliest;
-                        e.ConfigureSaga<DiscordPurchaseNotificationSaga>(context);
+                        e.ConfigureSaga<DiscordSagaConsumer>(context);
+                    });
+
+                    cfg.TopicEndpoint<Null, LicenseNotificationEvent>("Discord-Notification", "Discord", e =>
+                    {
+                        e.CreateIfMissing(p => p.NumPartitions = 1);
+                        e.AutoOffsetReset = AutoOffsetReset.Earliest;
+                        e.ConfigureSaga<DiscordSagaConsumer>(context);
                     });
                 });
             });
