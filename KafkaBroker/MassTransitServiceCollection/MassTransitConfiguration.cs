@@ -36,7 +36,7 @@ public static class MassTransitConfiguration
             x.AddRider(r =>
             {
                 r.AddSagaStateMachine<LicenseStateMachine, LicenseState>().InMemoryRepository(); //MongoDb
-                //r.AddSaga<DiscordPurchaseNotificationSaga>().InMemoryRepository(); //MongoDb
+                r.AddSaga<DiscordPurchaseNotificationSaga>().InMemoryRepository(); //MongoDb
 
                 r.AddProducer<LicenseGrantEvent>("Discord-License-Notification");
 
@@ -48,7 +48,7 @@ public static class MassTransitConfiguration
                     {
                         e.CreateIfMissing(p => p.NumPartitions = 1);
                         e.AutoOffsetReset = AutoOffsetReset.Earliest;
-                        //e.ConfigureSaga<DiscordPurchaseNotificationSaga>(context);
+                        e.ConfigureSaga<DiscordPurchaseNotificationSaga>(context);
                     });
                 });
             });

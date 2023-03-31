@@ -100,81 +100,81 @@ namespace DiscordSaga
         }
     }
 
-    //public class DiscordPurchaseNotificationSaga : ISaga, InitiatedBy<LicenseGrantEvent>, Orchestrates<LicenseNotificationEvent>
-    //{
-    //    public Guid CorrelationId { get; set; }
+    public class DiscordPurchaseNotificationSaga : ISaga, InitiatedBy<LicenseGrantEvent>, Orchestrates<LicenseNotificationEvent>
+    {
+        public Guid CorrelationId { get; set; }
 
-    //    private readonly ILogger<DiscordPurchaseNotificationSaga> _logger;
-    //    private readonly IDiscordBotNotificationRepository _botNotificationRepository;
-    //    private readonly IUnitOfWork<AuthDbContext> _unitOfWork;
-    //    private readonly IDiscordGatewayBuyHandlerRepository _license;
+        private readonly ILogger<DiscordPurchaseNotificationSaga> _logger;
+        private readonly IDiscordBotNotificationRepository _botNotificationRepository;
+        private readonly IUnitOfWork<AuthDbContext> _unitOfWork;
+        private readonly IDiscordGatewayBuyHandlerRepository _license;
 
-    //    #pragma warning disable CS8618
-    //    public DiscordPurchaseNotificationSaga() {}
-    //    #pragma warning restore CS8618
+#pragma warning disable CS8618
+        public DiscordPurchaseNotificationSaga() { }
+#pragma warning restore CS8618
 
-    //    public DiscordPurchaseNotificationSaga(ILogger<DiscordPurchaseNotificationSaga> logger, IDiscordBotNotificationRepository botNotificationRepository, IUnitOfWork<AuthDbContext> unitOfWork, IDiscordGatewayBuyHandlerRepository license)
-    //    {
-    //        _logger = logger;
-    //        _botNotificationRepository = botNotificationRepository;
-    //        _unitOfWork = unitOfWork;
-    //        _license = license;
-    //    }
+        public DiscordPurchaseNotificationSaga(ILogger<DiscordPurchaseNotificationSaga> logger, IDiscordBotNotificationRepository botNotificationRepository, IUnitOfWork<AuthDbContext> unitOfWork, IDiscordGatewayBuyHandlerRepository license)
+        {
+            _logger = logger;
+            _botNotificationRepository = botNotificationRepository;
+            _unitOfWork = unitOfWork;
+            _license = license;
+        }
 
-    //    public async Task Consume(ConsumeContext<LicenseGrantEvent> context)
-    //    {
-    //        try
-    //        {
-    //            _logger.LogInformation("Received GrantLicense command with payload: {Payload}", context.Message.Payload);
+        public async Task Consume(ConsumeContext<LicenseGrantEvent> context)
+        {
+            try
+            {
+                _logger.LogInformation("Received GrantLicense command with payload: {Payload}", context.Message.Payload);
 
-    //            await _unitOfWork.CreateTransaction(IsolationLevel.Serializable);
-    //            if (context.Message.Payload != null)
-    //            {
-    //                var license = await _license.OrderHandler(context.Message.Payload);
+                await _unitOfWork.CreateTransaction(IsolationLevel.Serializable);
+                if (context.Message.Payload != null)
+                {
+                    var license = await _license.OrderHandler(context.Message.Payload);
 
-    //                await _unitOfWork.Commit();
+                    await _unitOfWork.Commit();
 
-    //                await context.Publish(new LicenseNotificationEvent
-    //                {
-    //                    Payload = license.Payload,
-    //                    Quantity = license.Quantity,
-    //                    Time = license.Time,
-    //                    WhichSpec = license.WhichSpec,
-    //                    CorrelationId = context.Message.CorrelationId,
-    //                });
+                    await context.Publish(new LicenseNotificationEvent
+                    {
+                        Payload = license.Payload,
+                        Quantity = license.Quantity,
+                        Time = license.Time,
+                        WhichSpec = license.WhichSpec,
+                        CorrelationId = context.Message.CorrelationId,
+                    });
 
-    //                _logger.LogInformation("Published Notify event with CorrelationId: {CorrelationId}", context.Message.CorrelationId);
-    //            }
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            _logger.LogError(ex, "License Consumer Error");
-    //        }
-    //    }
-    //    public async Task Consume(ConsumeContext<LicenseNotificationEvent> context)
-    //    {
-    //        try
-    //        {
-    //            _logger.LogInformation("Received Notify event with CorrelationId: {CorrelationId}", context.Message.CorrelationId);
+                    _logger.LogInformation("Published Notify event with CorrelationId: {CorrelationId}", context.Message.CorrelationId);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "License Consumer Error");
+            }
+        }
+        public async Task Consume(ConsumeContext<LicenseNotificationEvent> context)
+        {
+            try
+            {
+                _logger.LogInformation("Received Notify event with CorrelationId: {CorrelationId}", context.Message.CorrelationId);
 
-    //            // Perform some business logic to send the notification
-    //            await _botNotificationRepository.NotificationHandler(new LicenseNotificationEvent
-    //            {
-    //                Payload = context.Message.Payload,
-    //                Quantity = context.Message.Quantity,
-    //                Time = context.Message.Time,
-    //                WhichSpec = context.Message.WhichSpec
-    //            });
+                // Perform some business logic to send the notification
+                await _botNotificationRepository.NotificationHandler(new LicenseNotificationEvent
+                {
+                    Payload = context.Message.Payload,
+                    Quantity = context.Message.Quantity,
+                    Time = context.Message.Time,
+                    WhichSpec = context.Message.WhichSpec
+                });
 
-    //            _logger.LogInformation("Sent notification with Quantity: {Quantity}, Time: {Time}, WhichSpec: {WhichSpec}",
-    //                context.Message.Quantity, context.Message.Time, context.Message.WhichSpec);
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            _logger.LogError(ex, "Notification Error");
-    //        }
-    //    }
-    //}
+                _logger.LogInformation("Sent notification with Quantity: {Quantity}, Time: {Time}, WhichSpec: {WhichSpec}",
+                    context.Message.Quantity, context.Message.Time, context.Message.WhichSpec);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Notification Error");
+            }
+        }
+    }
 }
 
 
