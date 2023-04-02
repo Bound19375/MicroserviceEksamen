@@ -13,10 +13,10 @@ namespace DiscordSaga.Components.Discord;
 
     public class LicenseNotificationEvent : CorrelatedBy<Guid>
     {
-        public string? Payload { get; init; }
-        public int? Quantity { get; init; }
-        public DateTime Time { get; init; }
-        public WhichSpec? WhichSpec { get; init; }
+        public string? Payload { get; set; }
+        public int? Quantity { get; set; }
+        public DateTime Time { get; set; }
+        public WhichSpec? WhichSpec { get; set; }
         public Guid CorrelationId { get; set; }
     }
 

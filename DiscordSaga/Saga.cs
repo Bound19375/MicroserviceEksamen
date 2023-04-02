@@ -47,13 +47,6 @@ namespace DiscordSaga
 
             During(Granted,
                 When(Notify)
-                    .Then(context =>
-                    {
-                        context.Saga.CorrelationId = context.Message.CorrelationId;
-                        context.Saga.Quantity = context.Message.Quantity;
-                        context.Saga.Time = context.Message.Time;
-                        context.Saga.WhichSpec = context.Message.WhichSpec;
-                    })
                     .Finalize()
             );
 
