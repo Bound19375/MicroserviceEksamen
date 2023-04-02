@@ -34,12 +34,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BrokersService\BrokersService.csproj" />
     <ProjectReference Include="..\Crosscutting\Crosscutting.csproj" />
     <ProjectReference Include="..\DiscordBot.Application\DiscordBot.Application.csproj" />
     <ProjectReference Include="..\DiscordBot.Infrastructure\DiscordBot.Infrastructure.csproj" />
     <ProjectReference Include="..\DiscordSaga.Components\DiscordSaga.Components.csproj" />
     <ProjectReference Include="..\DiscordSaga\DiscordSaga.csproj" />
-    <ProjectReference Include="..\KafkaBroker\BrokersService.csproj" />
+    <ProjectReference Include="..\BrokersService\BrokersService.csproj" />
   </ItemGroup>
 
   <ItemGroup>

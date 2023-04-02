@@ -8,7 +8,7 @@
         "api.auth": "StartDebugging",
         "api.discordbot": "StartDebugging",
         "boundbot": "StartDebugging",
-        "kafkabroker": "StartDebugging",
+        "BrokersService": "StartDebugging",
         "dbcleanupservice": "StartDebugging"
       }
     }

@@ -1,7 +1,9 @@
-﻿using Crosscutting.SellixPayload;
+﻿using System.Text.Json.Nodes;
+using Crosscutting.SellixPayload;
 using DiscordBot.Application.Interface;
 using DiscordSaga.Components.Discord;
 using MassTransit;
+using Newtonsoft.Json;
 
 namespace DiscordBot.Application.Implementation
 {
@@ -17,15 +19,17 @@ namespace DiscordBot.Application.Implementation
             _publishEndpoint = publishEndpoint;
         }
 
-        async Task IDiscordGatewayBuyHandlerImplementation.GrantLicense(SellixPayloadNormal.Root root)
+        async Task<bool> IDiscordGatewayBuyHandlerImplementation.GrantLicense(JsonObject root)
         {
             try
             {
                 await _topicProducer.Produce(new LicenseGrantEvent
                 {
                     CorrelationId = Guid.NewGuid(),
-                    Payload = root
+                    Payload = root.ToJsonString()
                 });
+
+                return true;
             }
             catch (Exception ex)
             {

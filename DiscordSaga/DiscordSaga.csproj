@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MassTransit.Kafka" Version="8.0.14" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Auth.Database\Auth.Database.csproj" />
 	  <ProjectReference Include="..\Crosscutting\Crosscutting.csproj" />
 	  <ProjectReference Include="..\DiscordBot.Application\DiscordBot.Application.csproj" />

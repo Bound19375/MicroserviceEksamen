@@ -8,6 +8,7 @@ using Crosscutting;
 using Crosscutting.SellixPayload;
 using DiscordSaga.Components.Discord;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 
 namespace DiscordSaga
 {
@@ -25,21 +26,21 @@ namespace DiscordSaga
     {
         
         public State Granted { get; private set; }
-        public Event<LicenseGrantEvent> LicenseGranted { get; private set; }
+        public Event<LicenseGrantEvent> GrantLicense { get; private set; }
         public Event<LicenseNotificationEvent> Notify { get; private set; }
 
         public LicenseStateMachine()
         {
-            Event(() => LicenseGranted, x => x.CorrelateById(context => context.Message.CorrelationId));
+            Event(() => GrantLicense, x => x.CorrelateById(context => context.Message.CorrelationId));
             Event(() => Notify, x => x.CorrelateById(context => context.Message.CorrelationId));
 
             InstanceState(x => x.CurrentState, Initial, Final, Granted);
 
             Initially(
-                When(LicenseGranted)
+                When(GrantLicense)
                     .Then(context =>
                     {
-                        context.Saga.Payload = context.Message.Payload;
+                        context.Saga.CorrelationId = context.Message.CorrelationId;
                     })
                     .TransitionTo(Granted)
             );
@@ -48,16 +49,10 @@ namespace DiscordSaga
                 When(Notify)
                     .Then(context =>
                     {
+                        context.Saga.CorrelationId = context.Message.CorrelationId;
                         context.Saga.Quantity = context.Message.Quantity;
                         context.Saga.Time = context.Message.Time;
                         context.Saga.WhichSpec = context.Message.WhichSpec;
-                    })
-                    .Publish(context => new LicenseNotificationEvent
-                    {
-                        Payload = context.Saga.Payload,
-                        Quantity = context.Saga.Quantity,
-                        Time = context.Saga.Time,
-                        WhichSpec = context.Saga.WhichSpec,
                     })
                     .Finalize()
             );
@@ -66,19 +61,23 @@ namespace DiscordSaga
         }
     }
 
-    public class DiscordSagaConsumer : ISaga, InitiatedBy<LicenseGrantEvent>, Orchestrates<LicenseNotificationEvent>
+    public class LicenseGrantEventConsumer : IConsumer<LicenseGrantEvent>
     {
-        public Guid CorrelationId { get; set; }
+        private readonly ILogger<LicenseGrantEventConsumer> _logger;
+        private readonly IUnitOfWork<AuthDbContext> _unitOfWork;
+        private readonly IDiscordGatewayBuyHandlerRepository _license;
+        private readonly ITopicProducer<LicenseNotificationEvent> _producer;
 
-        public DiscordSagaConsumer() { }
-
+        public LicenseGrantEventConsumer(ILogger<LicenseGrantEventConsumer> logger, IUnitOfWork<AuthDbContext> unitOfWork, IDiscordGatewayBuyHandlerRepository license, ITopicProducer<LicenseNotificationEvent> producer)
+        {
+            _logger = logger;
+            _unitOfWork = unitOfWork;
+            _license = license;
+            _producer = producer;
+        }
 
         public async Task Consume(ConsumeContext<LicenseGrantEvent> context)
         {
-            var _logger = context.GetPayload<ILogger<DiscordSagaConsumer>>();
-            var _unitOfWork = context.GetPayload<IServiceProvider>().GetService<IUnitOfWork<AuthDbContext>>();
-            var _license = context.GetPayload<IServiceProvider>().GetService<IDiscordGatewayBuyHandlerRepository>();
-
             try
             {
                 _logger.LogInformation("Received GrantLicense command with payload: {Payload}", context.Message.Payload);
@@ -86,11 +85,14 @@ namespace DiscordSaga
                 await _unitOfWork.CreateTransaction(IsolationLevel.Serializable);
                 if (context.Message.Payload != null)
                 {
-                    var license = await _license.OrderHandler(context.Message.Payload);
+                    var deserializePayload =
+                        JsonConvert.DeserializeObject<SellixPayloadNormal.Root>(context.Message.Payload);
+
+                    var license = await _license.OrderHandler(deserializePayload ?? throw new NullReferenceException("LicenseGrant Payload Null"));
 
                     await _unitOfWork.Commit();
 
-                    await context.Publish(new LicenseNotificationEvent
+                    await _producer.Produce(new LicenseNotificationEvent
                     {
                         Payload = license.Payload,
                         Quantity = license.Quantity,
@@ -107,13 +109,21 @@ namespace DiscordSaga
                 _logger.LogError(ex, "License Consumer Error");
             }
         }
+    }
+
+    public class LicenseNotificationEventConsumer : IConsumer<LicenseNotificationEvent>
+    {
+        private readonly ILogger<LicenseNotificationEventConsumer> _logger;
+        private readonly IDiscordBotNotificationRepository _botNotificationRepository;
+
+        public LicenseNotificationEventConsumer(ILogger<LicenseNotificationEventConsumer> logger, IDiscordBotNotificationRepository botNotificationRepository)
+        {
+            _logger = logger;
+            _botNotificationRepository = botNotificationRepository;
+        }
+
         public async Task Consume(ConsumeContext<LicenseNotificationEvent> context)
         {
-            var _logger = context.GetPayload<ILogger<DiscordSagaConsumer>>();
-            var _botNotificationRepository = context.GetPayload<IServiceProvider>().GetService<IDiscordBotNotificationRepository>();
-            var _unitOfWork = context.GetPayload<IServiceProvider>().GetService<IUnitOfWork<AuthDbContext>>();
-            var _license = context.GetPayload<IServiceProvider>().GetService<IDiscordGatewayBuyHandlerRepository>();
-
             try
             {
                 _logger.LogInformation("Received Notify event with CorrelationId: {CorrelationId}", context.Message.CorrelationId);

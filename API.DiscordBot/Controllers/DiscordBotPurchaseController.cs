@@ -20,10 +20,12 @@ namespace API.DiscordBot.Controllers
         {
             try
             {
-                string? jsonString = json.ToString() ?? throw new Exception("JsonObject Is Invalid!");
-                SellixPayloadNormal.Root data = JsonConvert.DeserializeObject<SellixPayloadNormal.Root>(jsonString) ?? throw new Exception("Invalid Json Object");
-                await _handler.GrantLicense(data);
-                return Ok();
+                var result = await _handler.GrantLicense(json);
+
+                if (result)
+                    return Ok();
+
+                return StatusCode(StatusCodes.Status500InternalServerError, "Serialization Failure");
             }
             catch (Exception ex)
             {

@@ -11,15 +11,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Auth.Database.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20230216142954_0.5")]
-    partial class _05
+    [Migration("20230402133840_0.1")]
+    partial class _01
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.2")
+                .HasAnnotation("ProductVersion", "7.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("Auth.Database.Model.ActiveLicensesDbModel", b =>

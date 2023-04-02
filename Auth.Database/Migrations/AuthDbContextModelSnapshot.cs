@@ -16,7 +16,7 @@ namespace Auth.Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.2")
+                .HasAnnotation("ProductVersion", "7.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("Auth.Database.Model.ActiveLicensesDbModel", b =>
@@ -82,7 +82,7 @@ namespace Auth.Database.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Hwid")
+                    b.Property<string>("HWID")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -170,7 +170,7 @@ namespace Auth.Database.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Hwid")
+                    b.Property<string>("HWID")
                         .IsRequired()
                         .HasColumnType("longtext");
 

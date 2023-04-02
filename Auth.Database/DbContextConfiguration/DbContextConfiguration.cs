@@ -11,12 +11,14 @@ public static class DbContextConfiguration
     public static IServiceCollection AddMasterDbContext(this IServiceCollection services, IConfiguration builder)
     {
         // Add services to the container.
-        //dotnet ef migrations add 0.1 --project Auth.Database --startup-project BoundCoreWebApplication --context AuthDbContext
-        //dotnet ef database update --project Auth.Database --startup-project BoundCoreWebApplication --context AuthDbContext
+        //dotnet ef migrations add 0.1 --project Auth.Database --startup-project BrokersService --context AuthDbContext
+        //dotnet ef database update --project Auth.Database --startup-project BrokersService --context AuthDbContext --connection "server=localhost;port=3306;database=Boundcore.Master;user=user;password=password;AllowPublicKeyRetrieval=True;SslMode=preferred;"
+        //dotnet tool update --global dotnet-ef
+        //$env:ConnectionStrings__BoundcoreMaster='server=localhost;port=3306;database=Boundcore.Master;user=user;password=password;AllowPublicKeyRetrieval=True;SslMode=preferred;'
         services.AddDbContext<AuthDbContext>(options =>
         {
-            options.UseMySql(builder.GetConnectionString("BoundcoreMaster") ?? throw new InvalidOperationException(),
-                ServerVersion.AutoDetect(builder.GetConnectionString("BoundcoreMaster")) ?? throw new InvalidOperationException(),
+            options.UseMySql(builder.GetConnectionString("BoundcoreMaster") ?? throw new InvalidOperationException("Version Exception"),
+                ServerVersion.AutoDetect(builder.GetConnectionString("BoundcoreMaster")) ?? throw new InvalidOperationException("ConnStr Exception"),
                 x =>
                 {
 

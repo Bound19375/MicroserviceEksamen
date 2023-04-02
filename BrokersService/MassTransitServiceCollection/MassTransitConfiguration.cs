@@ -6,6 +6,7 @@ using DiscordBot.Infrastructure;
 using DiscordSaga;
 using DiscordSaga.Components.Discord;
 using MassTransit;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serilog;
 
 namespace Broker.MassTransitServiceCollection;
@@ -33,12 +34,19 @@ public static class MassTransitConfiguration
                 cfg.ConfigureEndpoints(context);
             });
 
+            x.TryAddScoped<IUnitOfWork<AuthDbContext>, UnitOfWork<AuthDbContext>>();
+            x.TryAddScoped<IDiscordGatewayBuyHandlerRepository, DiscordGatewayBuyHandlerRepository>();
+            x.TryAddScoped<IDiscordBotNotificationRepository, DiscordBotNotificationRepository>();
+
             x.AddRider(r =>
             {
                 r.AddSagaStateMachine<LicenseStateMachine, LicenseState>().InMemoryRepository(); //MongoDb
-                r.AddSaga<DiscordSagaConsumer>().InMemoryRepository(); //MongoDb
 
                 r.AddProducer<LicenseGrantEvent>("Discord-License");
+                r.AddProducer<LicenseNotificationEvent>("Discord-Notification");
+
+                r.AddConsumer<LicenseGrantEventConsumer>();
+                r.AddConsumer<LicenseNotificationEventConsumer>();
 
                 r.UsingKafka((context, cfg) =>
                 {
@@ -46,17 +54,28 @@ public static class MassTransitConfiguration
 
                     cfg.TopicEndpoint<Null,LicenseGrantEvent>("Discord-License", "Discord", e =>
                     {
-                        e.CreateIfMissing(p => p.NumPartitions = 1);
-                        e.AutoOffsetReset = AutoOffsetReset.Earliest;
-                        e.ConfigureSaga<DiscordSagaConsumer>(context);
+                        e.CreateIfMissing(m =>
+                        {
+                            m.NumPartitions = 1;
+                        });
+                        e.ConfigureSaga<LicenseState>(context);
+                        e.UseNewtonsoftJsonSerializer();
+                        e.UseNewtonsoftJsonDeserializer();
+                        e.ConfigureConsumer<LicenseGrantEventConsumer>(context);
                     });
 
                     cfg.TopicEndpoint<Null, LicenseNotificationEvent>("Discord-Notification", "Discord", e =>
                     {
-                        e.CreateIfMissing(p => p.NumPartitions = 1);
-                        e.AutoOffsetReset = AutoOffsetReset.Earliest;
-                        e.ConfigureSaga<DiscordSagaConsumer>(context);
+                        e.CreateIfMissing(m =>
+                        {
+                            m.NumPartitions = 1;
+                        });
+                        e.ConfigureSaga<LicenseState>(context);
+                        e.UseNewtonsoftJsonSerializer();
+                        e.UseNewtonsoftJsonDeserializer();
+                        e.ConfigureConsumer<LicenseNotificationEventConsumer>(context); 
                     });
+
                 });
             });
         });

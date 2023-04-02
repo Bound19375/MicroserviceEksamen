@@ -6,6 +6,7 @@ using DiscordBot.Application.Interface;
 using DiscordSaga.Components.Discord;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace DiscordBot.Infrastructure
 {
@@ -28,8 +29,7 @@ namespace DiscordBot.Infrastructure
                     root.Data.StatusHistory[0].InvoiceId != "dummy")
                 {
                     var userExists = await _db.User!.FirstOrDefaultAsync(x =>
-                        x.DiscordId == root.Data.CustomFields.DiscordId &&
-                        x.DiscordUsername == root.Data.CustomFields.DiscordUser);
+                        x.DiscordId == root.Data.CustomFields.DiscordId);
 
                     _logger.LogInformation(root.Data.CustomFields.DiscordId + " " + root.Data.CustomFields.DiscordUser +
                                            " @ Engaged purchase at: " + DateTime.UtcNow);
@@ -140,9 +140,10 @@ namespace DiscordBot.Infrastructure
                     await _db.ActiveLicenses!.AddAsync(licenses);
                     await _db.SaveChangesAsync();
 
+                    var serializePayload = JsonConvert.SerializeObject(root);
                     var message = new LicenseNotificationEvent
                     {
-                        Payload = root,
+                        Payload = serializePayload,
                         Quantity = quantity,
                         Time = time,
                         WhichSpec = whichSpec,

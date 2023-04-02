@@ -88,12 +88,14 @@ services:
       - private_network
     environment:
       - ConnectionStrings__BoundcoreMaster=${ConnectionStrings__BoundcoreMaster}
+      - Discord__Token=${DiscordToken}
+      - Discord__Guid=${DiscordGuid} 
     build:
       context: .
       dockerfile: DbCleanupService/Dockerfile
 
-  kafkabroker:
-    image: ${DOCKER_REGISTRY-}kafkabroker
+  BrokersService:
+    image: ${DOCKER_REGISTRY-}brokersservice
     #platform: linux/arm64/v8
     networks: 
       - private_network
@@ -101,9 +103,11 @@ services:
       - ConnectionStrings__BoundcoreMaster=${ConnectionStrings__BoundcoreMaster}
       - RabbitMQ__User=${RabbitMQUser}
       - RabbitMQ__Pass=${RabbitMQPass}
+      - Discord__Token=${DiscordToken}
+      - Discord__Guid=${DiscordGuid} 
     build:
       context: .
-      dockerfile: KafkaBroker/Dockerfile
+      dockerfile: BrokersService/Dockerfile
     
 #####################################################################################
 ############################  External Docker Services  #############################
@@ -241,6 +245,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: Boundcore.Master
     volumes:
       - persistedData:/var/lib/mysql
     ports:
