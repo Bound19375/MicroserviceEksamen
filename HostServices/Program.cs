@@ -1,15 +1,17 @@
 using Auth.Database;
 using Auth.Database.DbContextConfiguration;
 using Crosscutting.TransactionHandling;
-using DbCleanupService.HostService;
 using DiscordBot.Application.Implementation;
 using DiscordBot.Application.Interface;
 using DiscordBot.Infrastructure;
+using HostServices.HostService;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.AddEnvironmentVariables();
 
 builder.Logging.ClearProviders().AddSerilog().AddConsole();
 
@@ -21,25 +23,46 @@ builder.Services.Scan(a => a.FromCallingAssembly().AddClasses().AsMatchingInterf
 builder.Services.AddScoped<IUnitOfWork<AuthDbContext>, UnitOfWork<AuthDbContext>>();
 builder.Services.AddScoped<IDiscordBotCleanupRepository, DiscordBotCleanupRepository>();
 builder.Services.AddScoped<IDiscordBotCleanupImplementation, DiscordBotCleanupImplementation>();
+builder.Services.AddScoped<IMariaDbBackupImplementation, MariaDbBackupImplementation>();
+builder.Services.AddScoped<IMariaDbBackupRepository, MariaDbBackupRepository>();
 
 //Quartz
 builder.Services.AddQuartz(q =>
 {
-    var jobKey = new JobKey("Purge");
-    q.AddJob<HostService>(opts =>
+    var jobPurge = new JobKey("Purge");
+    var jobBackup = new JobKey("Backup");
+
+    q.AddJob<PurgeService>(opts =>
     {
-        opts.WithIdentity(jobKey);
+        opts.WithIdentity(jobPurge);
+    });
+
+    q.AddJob<MariaDbBackup>(opts =>
+    {
+        opts.WithIdentity(jobBackup);
     });
 
     q.AddTrigger(opts =>
     {
-        opts.ForJob(jobKey);
-        opts.WithIdentity("MyJob-Trigger");
+        opts.ForJob(jobPurge);
+        opts.WithIdentity("JobPurge-Trigger");
         opts.WithCronSchedule("0 0 0 ? * * *");
         //opts.WithSimpleSchedule(x=> {
         //    x.WithIntervalInSeconds(1);
         //    x.WithRepeatCount(0);
         //});
+    });
+
+    q.AddTrigger(opts =>
+    {
+        opts.ForJob(jobBackup);
+        opts.WithIdentity("JobBackup-Trigger");
+        //opts.WithCronSchedule("0 0 0 ? * * *");
+        opts.WithSimpleSchedule(x =>
+        {
+            x.WithIntervalInSeconds(1);
+            x.WithRepeatCount(0);
+        });
     });
 
     q.UseMicrosoftDependencyInjectionJobFactory();

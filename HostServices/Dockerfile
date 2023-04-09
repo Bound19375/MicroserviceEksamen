@@ -12,24 +12,24 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:latest AS build
 WORKDIR /src
-COPY ["DbCleanupService/DbCleanupService.csproj", "DbCleanupService/"]
+COPY ["HostServices/HostServices.csproj", "HostServices/"]
 COPY ["DiscordBot.Application/DiscordBot.Application.csproj", "DiscordBot.Application/"]
 COPY ["Auth.Database/Auth.Database.csproj", "Auth.Database/"]
 COPY ["Crosscutting/Crosscutting.csproj", "Crosscutting/"]
-RUN dotnet restore "DbCleanupService/DbCleanupService.csproj"
+RUN dotnet restore "HostServices/HostServices.csproj"
 COPY . .
-WORKDIR "/src/DbCleanupService"
-RUN dotnet build "DbCleanupService.csproj" -c Release -o /app/build
+WORKDIR "/src/HostServices"
+RUN dotnet build "HostServices.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "DbCleanupService.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "HostServices.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM win AS finalWin
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "DbCleanupService.dll"]
+ENTRYPOINT ["dotnet", "HostServices.dll"]
 
 FROM arm AS finalArm
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "DbCleanupService.dll"]
+ENTRYPOINT ["dotnet", "HostServices.dll"]

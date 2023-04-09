@@ -81,8 +81,8 @@ services:
       context: .
       dockerfile: API.DiscordBot/Dockerfile
 
-  dbcleanupservice:
-    image: ${DOCKER_REGISTRY-}dbcleanupservice
+  HostServices:
+    image: ${DOCKER_REGISTRY-}hostservices
     #platform: linux/arm64/v8
     networks: 
       - private_network
@@ -92,7 +92,7 @@ services:
       - Discord__Guid=${DiscordGuid} 
     build:
       context: .
-      dockerfile: DbCleanupService/Dockerfile
+      dockerfile: HostServices/Dockerfile
 
   BrokersService:
     image: ${DOCKER_REGISTRY-}brokersservice
