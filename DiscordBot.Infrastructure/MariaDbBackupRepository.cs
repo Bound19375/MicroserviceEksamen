@@ -46,14 +46,15 @@ public class MariaDbBackupRepository : IMariaDbBackupRepository
 
             var privateEmbed = new EmbedBuilder()
                 .WithThumbnailUrl("https://i.imgur.com/dxCVy9r.png")
-                .AddField($"backup_{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}", fileName)
+                .AddField($"backup_{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}", "")
                 .WithColor(Color.DarkOrange)
                 .WithCurrentTimestamp()
                 .Build();
 
             var privateChannel = await _client.GetChannelAsync(1094738809121423380); //backupChannel
             var textNotifier = privateChannel as SocketTextChannel;
-            await textNotifier!.SendFileAsync(backupStream, fileName, "", false, privateEmbed, null);
+            await textNotifier!.SendMessageAsync(embed: privateEmbed);
+            await textNotifier!.SendFileAsync(backupStream, fileName, "", false, null);
 
             await conn.CloseAsync();
         }
