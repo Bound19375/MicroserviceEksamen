@@ -24,7 +24,6 @@ namespace DiscordSaga
 
     public class LicenseStateMachine : MassTransitStateMachine<LicenseState>
     {
-        
         public State Granted { get; private set; }
         public Event<LicenseGrantEvent> GrantLicense { get; private set; }
         public Event<LicenseNotificationEvent> Notify { get; private set; }

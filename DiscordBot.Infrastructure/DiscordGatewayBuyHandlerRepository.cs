@@ -114,6 +114,12 @@ namespace DiscordBot.Infrastructure
                     else
                     {
                         dbUserId = userExists.UserId;
+
+                        if (userExists.DiscordUsername != root.Data.CustomFields.DiscordUser)
+                        {
+                            userExists.DiscordUsername = root.Data.CustomFields.DiscordUser;
+                            await _db.SaveChangesAsync();
+                        }
                     }
 
                     var order = new OrderDbModel
@@ -122,7 +128,7 @@ namespace DiscordBot.Infrastructure
                         UniqId = root.Data.Uniqid,
                         ProductName = root.Data.ProductTitle,
                         ProductPrice = root.Data.TotalDisplay.ToString() ?? "null",
-                        PurchaseDate = DateTime.UtcNow,
+                        PurchaseDate = DateTime.UtcNow
                     };
 
                     await _db.Order!.AddAsync(order);

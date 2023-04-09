@@ -1,4 +1,5 @@
 using Auth.Database;
+using Auth.Database.DbContextConfiguration;
 using Crosscutting.TransactionHandling;
 using DbCleanupService.HostService;
 using DiscordBot.Application.Implementation;
@@ -12,15 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Logging.ClearProviders().AddSerilog().AddConsole();
 
-builder.Services.AddDbContext<AuthDbContext>(options =>
-{
-    options.UseMySql(builder.Configuration.GetConnectionString("BoundcoreMaster") ?? throw new InvalidOperationException(),
-        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("BoundcoreMaster")) ?? throw new InvalidOperationException(),
-        x =>
-        {
-
-        });
-});
+builder.Services.AddMasterDbContext(builder.Configuration);
 
 //Dependency Injection
 builder.Services.Scan(a => a.FromCallingAssembly().AddClasses().AsMatchingInterface().WithScopedLifetime());
