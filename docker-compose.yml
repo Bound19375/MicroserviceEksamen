@@ -17,7 +17,7 @@ services:
       context: .
       dockerfile: apigateway/Dockerfile
     volumes:
-      - persistedData:/app/certs/
+      - persistedData_Certs:/app/certs/
       - ./Crosscutting/certs:/app/certs/
 
   boundbot:
@@ -75,7 +75,9 @@ services:
       - RabbitMQ__User=${RabbitMQUser}
       - RabbitMQ__Pass=${RabbitMQPass}
       - Discord__Token=${DiscordToken}
-      - Discord__Guid=${DiscordGuid} 
+      - Discord__Guid=${DiscordGuid}
+      - MONGO__USER=${MONGODB_USER}
+      - MONGO__PASSWORD=${MONGODB_PASSWORD}
     restart: always
     build:
       context: .
@@ -104,7 +106,9 @@ services:
       - RabbitMQ__User=${RabbitMQUser}
       - RabbitMQ__Pass=${RabbitMQPass}
       - Discord__Token=${DiscordToken}
-      - Discord__Guid=${DiscordGuid} 
+      - Discord__Guid=${DiscordGuid}
+      - MONGO__USER=${MONGODB_USER}
+      - MONGO__PASSWORD=${MONGODB_PASSWORD}
     build:
       context: .
       dockerfile: BrokersService/Dockerfile
@@ -230,13 +234,13 @@ services:
       - 5672:5672
       - 15672:15672
     volumes:
-      - persistedData:/var/lib/rabbitmq/
-      - persistedData:/var/log/rabbitmq
+      - persistedData_RabbitMq:/var/lib/rabbitmq/
+      - persistedData_RabbitMq:/var/log/rabbitmq
       - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
       - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
 
 #####################################################################################
-#################################  Debug Services  ##################################
+###############################  Database Services  #################################
 #####################################################################################
 
   mariaDB:
@@ -254,16 +258,34 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: Boundcore.Master
     volumes:
-      - persistedData:/var/lib/mysql
+      - persistedData_MariaDb:/var/lib/mysql
     ports:
       - "3306:3306"
+
+  mongoDB:
+    image: mongo:latest
+    #platform: linux/arm64/v8
+    restart: always
+    networks: 
+      - private_network
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
+      MONGO_INITDB_DATABASE: admin
+    ports:
+      - 27017:27017
+    volumes:
+      - persistedData_MongoDb:/data/db
 
 networks:
   private_network:
    driver: bridge
 
 volumes:
-  persistedData:
+  persistedData_Certs:
+  persistedData_MariaDb:
+  persistedData_MongoDb:
+  persistedData_RabbitMq:
 
 
 

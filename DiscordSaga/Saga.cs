@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 
 namespace DiscordSaga
 {
-    public class LicenseState : SagaStateMachineInstance
+    public class LicenseState : SagaStateMachineInstance, ISagaVersion
     {
         public Guid CorrelationId { get; set; }
         public SellixPayloadNormal.Root? Payload { get; set; }
@@ -20,6 +20,7 @@ namespace DiscordSaga
         public DateTime Time { get; set; }
         public WhichSpec? WhichSpec { get; set; }
         public int CurrentState { get; set; }
+        public int Version { get; set; }
     }
 
     public class LicenseStateMachine : MassTransitStateMachine<LicenseState>

@@ -5,7 +5,6 @@ using DiscordBot.Application.Implementation;
 using DiscordBot.Application.Interface;
 using DiscordBot.Infrastructure;
 using HostServices.HostService;
-using Microsoft.EntityFrameworkCore;
 using Quartz;
 using Serilog;
 
@@ -26,7 +25,6 @@ builder.Services.AddScoped<IDiscordBotCleanupImplementation, DiscordBotCleanupIm
 builder.Services.AddScoped<IMariaDbBackupImplementation, MariaDbBackupImplementation>();
 builder.Services.AddScoped<IMariaDbBackupRepository, MariaDbBackupRepository>();
 
-//Quartz
 builder.Services.AddQuartz(q =>
 {
     var jobPurge = new JobKey("Purge");
@@ -57,12 +55,12 @@ builder.Services.AddQuartz(q =>
     {
         opts.ForJob(jobBackup);
         opts.WithIdentity("JobBackup-Trigger");
-        //opts.WithCronSchedule("0 0 0 ? * * *");
-        opts.WithSimpleSchedule(x =>
-        {
-            x.WithIntervalInSeconds(1);
-            x.WithRepeatCount(0);
-        });
+        opts.WithCronSchedule("0 0 0/6 ? * * *");
+        //opts.WithSimpleSchedule(x =>
+        //{
+        //    x.WithIntervalInSeconds(1);
+        //    x.WithRepeatCount(0);
+        //});
     });
 
     q.UseMicrosoftDependencyInjectionJobFactory();

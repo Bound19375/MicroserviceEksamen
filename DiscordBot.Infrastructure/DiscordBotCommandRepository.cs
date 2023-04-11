@@ -17,7 +17,6 @@ namespace DiscordBot.Infrastructure
         private readonly ILogger _logger;
         private readonly AuthDbContext _db;
         private readonly IConfiguration _configuration;
-        private readonly DiscordSocketClient _client = DiscordClient.GetDiscordSocketClient();
 
         public DiscordBotCommandRepository(ILogger<DiscordBotCommandRepository> logger, AuthDbContext db, IConfiguration configuration)
         {
@@ -111,6 +110,8 @@ namespace DiscordBot.Infrastructure
         {
             try
             {
+                DiscordSocketClient client = DiscordClient.GetDiscordSocketClient(_configuration["Discord:Token"] ?? string.Empty);
+
                 _logger.LogInformation(model.DiscordUsername + " Engaged UpdateDiscord At: " + DateTime.UtcNow);
 
                 var check = await _db.ActiveLicenses.Include(user => user.User).Where(x => x.User.DiscordId == model.DiscordId || x.User.DiscordUsername == model.DiscordUsername).ToListAsync();
@@ -122,8 +123,8 @@ namespace DiscordBot.Infrastructure
 
                 if (activeLicenses >= 0)
                 {
-                    var guild = _client.GetGuild(ulong.Parse(_configuration["Discord:Guid"]!));
-                    var clientUser = await _client.GetUserAsync(ulong.Parse(model.DiscordId));
+                    var guild = client.GetGuild(ulong.Parse(_configuration["Discord:Guid"]!));
+                    var clientUser = await client.GetUserAsync(ulong.Parse(model.DiscordId));
 
                     IGuildUser? guildUser = null;
                     if (guild != null)

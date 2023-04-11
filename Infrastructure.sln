@@ -37,7 +37,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DiscordBot", "DiscordBot", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API.DiscordBot", "API.DiscordBot\API.DiscordBot.csproj", "{4B3843C1-C254-485F-A1E6-2D4E84625B00}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Databases", "Databases", "{4E7F8963-CCB2-44C1-AF4E-3CB3E30885AA}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EntityFrameworkCore", "EntityFrameworkCore", "{4E7F8963-CCB2-44C1-AF4E-3CB3E30885AA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Discord-Bot", "Discord-Bot", "{9413011F-81EC-45E7-B6BD-641ADC1A30F1}"
 EndProject
@@ -66,6 +66,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrokersService", "BrokersService\BrokersService.csproj", "{7E610443-1F11-4936-A3B6-9236F3AF5281}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HostServices", "HostServices\HostServices.csproj", "{D8A50F46-5398-4AB0-9D2C-2D26F729C0D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCore", "EFCore\EFCore.csproj", "{9DD52DE5-75B7-4FAD-89D2-948F482F5FEE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -141,6 +143,10 @@ Global
 		{D8A50F46-5398-4AB0-9D2C-2D26F729C0D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8A50F46-5398-4AB0-9D2C-2D26F729C0D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8A50F46-5398-4AB0-9D2C-2D26F729C0D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DD52DE5-75B7-4FAD-89D2-948F482F5FEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DD52DE5-75B7-4FAD-89D2-948F482F5FEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DD52DE5-75B7-4FAD-89D2-948F482F5FEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DD52DE5-75B7-4FAD-89D2-948F482F5FEE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -169,6 +175,7 @@ Global
 		{444237DD-840C-42AD-ADBD-F0FCD40D1217} = {1E1A6715-591E-484B-A39B-4AD70073F9B8}
 		{7E610443-1F11-4936-A3B6-9236F3AF5281} = {4A8DF047-A977-4699-98BC-B929650AB544}
 		{D8A50F46-5398-4AB0-9D2C-2D26F729C0D7} = {C58B2774-CBC4-4CC7-AE46-5F1D6D41C4F7}
+		{9DD52DE5-75B7-4FAD-89D2-948F482F5FEE} = {4E7F8963-CCB2-44C1-AF4E-3CB3E30885AA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CE416F04-8216-4705-B608-C1C8307CA0F1}

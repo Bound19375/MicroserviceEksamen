@@ -22,7 +22,7 @@ public class DiscordBot
 
         var service = new ServiceCollection();
         service.AddSingleton<IConfiguration>(configBuilder);
-        service.AddSingleton(DiscordClient.GetDiscordSocketClient());
+        service.AddSingleton(DiscordClient.GetDiscordSocketClient(configBuilder["Discord:Token"] ?? string.Empty));
         service.AddSingleton(DiscordClient.GetCommandService());
         service.AddHttpClient("httpClient", httpClient =>
         {

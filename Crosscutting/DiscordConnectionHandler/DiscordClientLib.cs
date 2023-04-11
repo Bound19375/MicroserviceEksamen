@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.Configuration;
 
 namespace Crosscutting.DiscordConnectionHandler
 {
@@ -8,25 +9,31 @@ namespace Crosscutting.DiscordConnectionHandler
     {
         public static class DiscordClient
         {
-#pragma warning disable CS8618
-            private static DiscordSocketClient _client;
-            private static CommandService _command;
-#pragma warning restore CS8618
-
-            public static DiscordSocketClient GetDiscordSocketClient()
+            #pragma warning disable CS8618
+            private static readonly DiscordSocketClient Client = new(new DiscordSocketConfig
             {
-                if (_client == null)
+                AlwaysDownloadUsers = true,
+                GatewayIntents = GatewayIntents.All
+            });
+            private static CommandService _command;
+            #pragma warning restore CS8618
+
+            public static DiscordSocketClient GetDiscordSocketClient(string token)
+            {
+                if (Client.ConnectionState != ConnectionState.Connected)
                 {
-                    _client = new DiscordSocketClient(new DiscordSocketConfig
+
+                    Client.SetGameAsync("/Help", null, ActivityType.Playing).Wait();
+                    Client.LoginAsync(TokenType.Bot, token).Wait();
+                    Client.StartAsync().Wait();
+
+                    while (Client.ConnectionState != ConnectionState.Connected)
                     {
-                        AlwaysDownloadUsers = true,
-                        GatewayIntents = GatewayIntents.All
-                    });
-                    _client.SetGameAsync("/Help", null, ActivityType.Playing).Wait();
-                    _client.LoginAsync(TokenType.Bot, "MTAxNDIxMzg0NzQ3MDU3NTY0Ng.GTchGK.2o1Nbp0JMMHrKOoyigdm9UjZhSqtv5IrTewARE").Wait();
-                    _client.StartAsync().Wait();
+                        Task.Delay(100).Wait();
+                    }
                 }
-                return _client;
+
+                return Client;
             }
 
             public static CommandService GetCommandService()

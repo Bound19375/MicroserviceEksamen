@@ -1,6 +1,6 @@
 using Auth.Database;
 using Auth.Database.DbContextConfiguration;
-using Broker.MassTransitServiceCollection;
+using BrokersService.MassTransitServiceCollection;
 using Crosscutting.TransactionHandling;
 using DiscordBot.Application.Interface;
 using DiscordBot.Infrastructure;

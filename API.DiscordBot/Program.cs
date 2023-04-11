@@ -1,6 +1,6 @@
 using Auth.Database;
 using Auth.Database.DbContextConfiguration;
-using Broker.MassTransitServiceCollection;
+using BrokersService.MassTransitServiceCollection;
 using Crosscutting.Configuration.AuthPolicyConfiguration;
 using Crosscutting.Configuration.JwtConfiguration;
 using Crosscutting.TransactionHandling;

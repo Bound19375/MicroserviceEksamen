@@ -9,7 +9,7 @@ using MassTransit;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serilog;
 
-namespace Broker.MassTransitServiceCollection;
+namespace BrokersService.MassTransitServiceCollection;
 
 public static class MassTransitConfiguration
 {
@@ -40,7 +40,13 @@ public static class MassTransitConfiguration
 
             x.AddRider(r =>
             {
-                r.AddSagaStateMachine<LicenseStateMachine, LicenseState>().InMemoryRepository(); //MongoDb
+                r.AddSagaStateMachine<LicenseStateMachine, LicenseState>().MongoDbRepository(m =>
+                {
+                    
+                    m.Connection = $"mongodb://{configuration["MONGO:USER"]}:{configuration["MONGO:PASSWORD"]}@mongoDB:27017/?authMechanism=DEFAULT";
+                    m.DatabaseName = "licensedb";
+                    m.CollectionName = "license";
+                });
 
                 r.AddProducer<LicenseGrantEvent>("Discord-License");
                 r.AddProducer<LicenseNotificationEvent>("Discord-Notification");

@@ -14,7 +14,6 @@ public class DiscordBotCleanupRepository : IDiscordBotCleanupRepository
 {
     private readonly AuthDbContext _db;
     private readonly ILogger<DiscordBotCleanupRepository> _logger;
-    private readonly DiscordSocketClient _client = DiscordClient.GetDiscordSocketClient();
     private readonly IConfiguration _configuration;
     private readonly IUnitOfWork<AuthDbContext> _unitOfWork;
 
@@ -30,6 +29,9 @@ public class DiscordBotCleanupRepository : IDiscordBotCleanupRepository
     {
         try
         {
+            DiscordSocketClient client = DiscordClient.GetDiscordSocketClient(_configuration["Discord:Token"] ?? string.Empty);
+
+
             var expiredLicenses = await _db.ActiveLicenses
                 .Include(user => user.User)
                 .Where(time => DateTime.UtcNow >= time.EndDate).ToListAsync();
@@ -45,7 +47,7 @@ public class DiscordBotCleanupRepository : IDiscordBotCleanupRepository
 
             try
             {
-                var guild = _client.GetGuild(ulong.Parse(_configuration["Discord:Guid"]!));
+                var guild = client.GetGuild(ulong.Parse(_configuration["Discord:Guid"]!));
                 var guildMembers = await guild.GetUsersAsync().FlattenAsync();
 
 
@@ -55,7 +57,7 @@ public class DiscordBotCleanupRepository : IDiscordBotCleanupRepository
 
                     if (guild != null)
                     {
-                        var clientUser = await _client.GetUserAsync(member.Id);
+                        var clientUser = await client.GetUserAsync(member.Id);
                         guildUser = guild.GetUser(clientUser.Id);
                     }
 
