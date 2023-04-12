@@ -8,13 +8,13 @@ namespace Crosscutting.Configuration.JwtConfiguration;
 
 public static class JwtApiResponse
 {
-    public static async Task<object> JwtRefreshAndGenerate(IEnumerable<Claim> claims, IConfiguration configuration, string refreshToken = null!)
+    public static async Task<object> JwtRefreshAndGenerate(IEnumerable<Claim> claims, IConfiguration configuration, string refreshToken, string discordId)
     {
         // check if a refresh token was provided
-        if (!string.IsNullOrEmpty(refreshToken))
+        if (!string.IsNullOrEmpty(refreshToken) || !string.IsNullOrEmpty(discordId))
         {
             // validate the refresh token against the storage mechanism
-            var validRefreshToken = await ValidateRefreshTokenAsync(refreshToken);
+            var validRefreshToken = await ValidateRefreshTokenAsync(refreshToken, discordId);
 
             // if the refresh token is valid, generate a new access token
             if (validRefreshToken)
@@ -36,7 +36,7 @@ public static class JwtApiResponse
                     Token = Guid.NewGuid().ToString(),
                     Expiration = DateTime.UtcNow.AddMinutes(10),
                 };
-                await SaveRefreshTokenAsync(newRefreshToken);
+                await SaveRefreshTokenAsync(newRefreshToken, discordId);
 
                 return new
                 {
@@ -64,7 +64,7 @@ public static class JwtApiResponse
             Token = Guid.NewGuid().ToString(),
             Expiration = DateTime.UtcNow.AddMinutes(10),
         };
-        await SaveRefreshTokenAsync(newRefreshToken2);
+        await SaveRefreshTokenAsync(newRefreshToken2, discordId);
 
         return new
         {
@@ -75,17 +75,54 @@ public static class JwtApiResponse
     }
 
     //InMemoryImplementation
-    private static readonly List<RefreshToken> RefreshTokens = new List<RefreshToken>();
-    private static async Task<bool> ValidateRefreshTokenAsync(string refreshToken)
+    private static readonly Dictionary<string, RefreshToken> RefreshTokens = new Dictionary<string, RefreshToken>();
+    private static async Task<bool> ValidateRefreshTokenAsync(string refreshToken, string discordId)
     {
-        RefreshTokens.RemoveAll(rt => rt.Expiration > DateTime.UtcNow);
+        var expired = RefreshTokens.Where(x => DateTime.UtcNow >= x.Value.Expiration);
 
-        return await Task.FromResult(RefreshTokens.Any(rt => rt.Token == refreshToken && rt.Expiration > DateTime.UtcNow));
+        foreach (var key in expired)
+        {
+            RefreshTokens.Remove(key.Key, out _);
+        }
+
+        return await Task.FromResult(RefreshTokens.Any(rt => rt.Value.Token == refreshToken && rt.Value.Expiration > DateTime.UtcNow 
+            || rt.Key == discordId));
     }
 
-    private static async Task SaveRefreshTokenAsync(RefreshToken refreshToken)
+    private static async Task SaveRefreshTokenAsync(RefreshToken refreshToken, string discordId)
     {
-        await Task.Run(() => RefreshTokens.Add(refreshToken));
+        if (string.IsNullOrEmpty(discordId))
+        {
+            try
+            {
+                await Task.Run(() => RefreshTokens.Add(Guid.NewGuid().ToString(), refreshToken));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+        else
+        {
+            try
+            {
+                await Task.Run(() =>
+                {
+                    if (RefreshTokens.ContainsKey(discordId))
+                    {
+                        RefreshTokens[discordId] = refreshToken;
+                    }
+                    else
+                    {
+                        RefreshTokens.Add(discordId, refreshToken);
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
     }
 }
 

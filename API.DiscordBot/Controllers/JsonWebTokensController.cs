@@ -41,7 +41,7 @@ namespace API.DiscordBot.Controllers
                 claims.Add(new Claim("staff", "staff"));
             }
 
-            var jwt = await JwtApiResponse.JwtRefreshAndGenerate(claims, _configuration, model.RefreshToken);
+            var jwt = await JwtApiResponse.JwtRefreshAndGenerate(claims, _configuration, model.RefreshToken, model.DiscordId);
 
             return await Task.FromResult(Ok(jwt));
         }

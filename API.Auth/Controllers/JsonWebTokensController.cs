@@ -30,7 +30,7 @@ namespace API.Auth.Controllers
                 new Claim("role", "User"),
             };
 
-            var jwt = await JwtApiResponse.JwtRefreshAndGenerate(claims, _configuration, body.RefreshToken);
+            var jwt = await JwtApiResponse.JwtRefreshAndGenerate(claims, _configuration, body.RefreshToken, null!);
 
             return await Task.FromResult(Ok(jwt));
         }

@@ -38,7 +38,15 @@ namespace BoundBot.Services
 
                 var roles = guilduser.Roles.Select(role => role.ToString()).ToList();
                 Model.Roles = roles.Count == 0 ? new List<string>() { "0000000000" } : roles;
+                Model.RefreshToken = string.Empty;
             }
+        }
+        private class JwtDto
+        {
+            public string AccessToken { get; set; }
+            public DateTime ExpiresIn { get; set; } 
+            public string RefreshToken { get; set; } 
+            //Use File to save & read refreshtoken
         }
 
         public async Task SlashCommandHandler(SocketSlashCommand command)
@@ -175,8 +183,9 @@ namespace BoundBot.Services
 
                 HttpResponseMessage jwtResponseMessage = await client.PostAsJsonAsync($"/gateway/API/DiscordBot/JwtGenerate", restModel.Model);
                 var jwtResponseBody = await jwtResponseMessage.Content.ReadAsStringAsync();
+                var jwtResponseBodyDeserialization = JsonConvert.DeserializeObject<JwtDto>(jwtResponseBody) ?? new JwtDto();
 
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtResponseBody);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtResponseBodyDeserialization.AccessToken);
 
                 HttpResponseMessage resp = await client.PutAsJsonAsync("/gateway/API/DiscordBot/Command/UpdateDiscord", restModel.Model);
                 var responseBody = await resp.Content.ReadAsStringAsync();
@@ -219,8 +228,9 @@ namespace BoundBot.Services
 
                 HttpResponseMessage jwtResponseMessage = await client.PostAsJsonAsync($"/gateway/API/DiscordBot/JwtGenerate", restModel.Model);
                 var jwtResponseBody = await jwtResponseMessage.Content.ReadAsStringAsync();
+                var jwtResponseBodyDeserialization = JsonConvert.DeserializeObject<JwtDto>(jwtResponseBody) ?? new JwtDto();
 
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtResponseBody);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtResponseBodyDeserialization.AccessToken);
 
                 HttpResponseMessage resp = await client.PutAsJsonAsync("/gateway/API/DiscordBot/Command/UpdateHwid", restModel.Model);
                 var responseBody = await resp.Content.ReadAsStringAsync();
@@ -260,8 +270,9 @@ namespace BoundBot.Services
 
                 HttpResponseMessage jwtResponseMessage = await client.PostAsJsonAsync($"/gateway/API/DiscordBot/JwtGenerate", restModel.Model);
                 var jwtResponseBody = await jwtResponseMessage.Content.ReadAsStringAsync();
+                var jwtResponseBodyDeserialization = JsonConvert.DeserializeObject<JwtDto>(jwtResponseBody) ?? new JwtDto();
 
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtResponseBody);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtResponseBodyDeserialization.AccessToken);
 
                 HttpResponseMessage resp = await client.GetAsync($"/gateway/API/DiscordBot/Query/CheckMe/{command.User.Username + " % 23" + command.User.Discriminator}/{command.User.Id}");
 
@@ -323,8 +334,9 @@ namespace BoundBot.Services
 
                     HttpResponseMessage jwtResponseMessage = await client.PostAsJsonAsync($"/gateway/API/DiscordBot/JwtGenerate", restModel.Model);
                     var jwtResponseBody = await jwtResponseMessage.Content.ReadAsStringAsync();
+                    var jwtResponseBodyDeserialization = JsonConvert.DeserializeObject<JwtDto>(jwtResponseBody) ?? new JwtDto();
 
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtResponseBody);
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtResponseBodyDeserialization.AccessToken);
 
                     HttpResponseMessage resp = await client.GetAsync($"/gateway/API/DiscordBot/Query/CheckDB/{options!.Username + "%23" + options.Discriminator}/{options.Id}");
                     var responseBody = await resp.Content.ReadAsStringAsync();
@@ -389,8 +401,10 @@ namespace BoundBot.Services
                     var client = _httpClient;
                     HttpResponseMessage jwtResponseMessage = await client.PostAsJsonAsync($"/gateway/API/DiscordBot/JwtGenerate", restModel.Model);
                     var jwtResponseBody = await jwtResponseMessage.Content.ReadAsStringAsync();
+                    var jwtResponseBodyDeserialization = JsonConvert.DeserializeObject<JwtDto>(jwtResponseBody) ?? new JwtDto();
 
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtResponseBody);
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtResponseBodyDeserialization.AccessToken);
+
                     HttpResponseMessage resp = await client.PostAsJsonAsync($"/gateway/API/DiscordBot/Command/StaffLicense", restModel.Model);
                     var responseBody = await resp.Content.ReadAsStringAsync();
                     if (resp.IsSuccessStatusCode)
