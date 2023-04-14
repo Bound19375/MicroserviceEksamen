@@ -4,7 +4,7 @@ using Crosscutting.SellixPayload;
 using Discord;
 using Discord.WebSocket;
 using DiscordBot.Application.Interface;
-using DiscordSaga.Components.Discord;
+using DiscordSaga.Components.Events;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;

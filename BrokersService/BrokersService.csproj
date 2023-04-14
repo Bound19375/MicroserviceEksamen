@@ -13,6 +13,7 @@
     <PackageReference Include="Confluent.Kafka" Version="2.1.0" />
     <PackageReference Include="MassTransit" Version="8.0.14" />
     <PackageReference Include="MassTransit.AspNetCore" Version="7.3.1" />
+    <PackageReference Include="MassTransit.Automatonymous.Extensions.DependencyInjection" Version="5.5.6" />
     <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.3.1" />
     <PackageReference Include="MassTransit.Kafka" Version="8.0.14" />
     <PackageReference Include="MassTransit.MongoDb" Version="8.0.14" />
@@ -33,6 +34,7 @@
   <ItemGroup>
 	  <ProjectReference Include="..\DiscordBot.Application\DiscordBot.Application.csproj" />
 	  <ProjectReference Include="..\DiscordBot.Infrastructure\DiscordBot.Infrastructure.csproj" />
+	  <ProjectReference Include="..\DiscordSaga.Consumers\DiscordSaga.Consumers.csproj" />
 	  <ProjectReference Include="..\DiscordSaga\DiscordSaga.csproj" />
   </ItemGroup>
 

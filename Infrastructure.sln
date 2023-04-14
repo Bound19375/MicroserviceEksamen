@@ -67,7 +67,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrokersService", "BrokersSe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HostServices", "HostServices\HostServices.csproj", "{D8A50F46-5398-4AB0-9D2C-2D26F729C0D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCore", "EFCore\EFCore.csproj", "{9DD52DE5-75B7-4FAD-89D2-948F482F5FEE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EFCore", "EFCore\EFCore.csproj", "{9DD52DE5-75B7-4FAD-89D2-948F482F5FEE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordSaga.Consumers", "DiscordSaga.Consumers\DiscordSaga.Consumers.csproj", "{03AB6056-9BF6-42F1-AFA5-F248C3E17FEA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -147,6 +149,10 @@ Global
 		{9DD52DE5-75B7-4FAD-89D2-948F482F5FEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DD52DE5-75B7-4FAD-89D2-948F482F5FEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9DD52DE5-75B7-4FAD-89D2-948F482F5FEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03AB6056-9BF6-42F1-AFA5-F248C3E17FEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03AB6056-9BF6-42F1-AFA5-F248C3E17FEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03AB6056-9BF6-42F1-AFA5-F248C3E17FEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03AB6056-9BF6-42F1-AFA5-F248C3E17FEA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -176,6 +182,7 @@ Global
 		{7E610443-1F11-4936-A3B6-9236F3AF5281} = {4A8DF047-A977-4699-98BC-B929650AB544}
 		{D8A50F46-5398-4AB0-9D2C-2D26F729C0D7} = {C58B2774-CBC4-4CC7-AE46-5F1D6D41C4F7}
 		{9DD52DE5-75B7-4FAD-89D2-948F482F5FEE} = {4E7F8963-CCB2-44C1-AF4E-3CB3E30885AA}
+		{03AB6056-9BF6-42F1-AFA5-F248C3E17FEA} = {1E1A6715-591E-484B-A39B-4AD70073F9B8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CE416F04-8216-4705-B608-C1C8307CA0F1}

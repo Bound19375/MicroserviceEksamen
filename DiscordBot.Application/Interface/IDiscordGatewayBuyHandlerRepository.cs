@@ -1,5 +1,5 @@
 ﻿using Crosscutting.SellixPayload;
-using DiscordSaga.Components.Discord;
+using DiscordSaga.Components.Events;
 
 namespace DiscordBot.Application.Interface
 {

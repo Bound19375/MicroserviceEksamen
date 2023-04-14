@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Nodes;
 using Crosscutting.SellixPayload;
 using DiscordBot.Application.Interface;
-using DiscordSaga.Components.Discord;
+using DiscordSaga.Components.Events;
 using MassTransit;
 using Newtonsoft.Json;
 

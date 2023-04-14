@@ -4,7 +4,8 @@ using Crosscutting.TransactionHandling;
 using DiscordBot.Application.Interface;
 using DiscordBot.Infrastructure;
 using DiscordSaga;
-using DiscordSaga.Components.Discord;
+using DiscordSaga.Components.Events;
+using DiscordSaga.Consumers;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serilog;
@@ -31,6 +32,7 @@ public static class MassTransitConfiguration
                     h.Username(configuration["RabbitMQ:User"]);
                     h.Password(configuration["RabbitMQ:Pass"]);
                 });
+
                 cfg.ConfigureEndpoints(context);
             });
 
@@ -42,13 +44,13 @@ public static class MassTransitConfiguration
             {
                 r.AddSagaStateMachine<LicenseStateMachine, LicenseState>().MongoDbRepository(m =>
                 {
-                    
-                    m.Connection = $"mongodb://{configuration["MONGO:USER"]}:{configuration["MONGO:PASSWORD"]}@mongoDB:27017/?authMechanism=DEFAULT";
+                    m.Connection =
+                        $"mongodb://{configuration["MONGO:USER"]}:{configuration["MONGO:PASSWORD"]}@mongoDB:27017";//"/?authMechanism=DEFAULT";
                     m.DatabaseName = "licensedb";
                     m.CollectionName = "license";
                 });
 
-                r.AddProducer<LicenseGrantEvent>("Discord-License");
+                r.AddProducer<LicenseGrantEvent>("Discord-License-Grant");
                 r.AddProducer<LicenseNotificationEvent>("Discord-Notification");
 
                 r.AddConsumer<LicenseGrantEventConsumer>();
@@ -58,7 +60,7 @@ public static class MassTransitConfiguration
                 {
                     cfg.Host("kafka");
 
-                    cfg.TopicEndpoint<Null,LicenseGrantEvent>("Discord-License", "Discord", e =>
+                    cfg.TopicEndpoint<Null,LicenseGrantEvent>("Discord-License-Grant", "Discord", e =>
                     {
                         e.CreateIfMissing(m =>
                         {
@@ -81,7 +83,6 @@ public static class MassTransitConfiguration
                         e.UseNewtonsoftJsonDeserializer();
                         e.ConfigureConsumer<LicenseNotificationEventConsumer>(context); 
                     });
-
                 });
             });
         });

@@ -3,7 +3,7 @@ using Auth.Database.Model;
 using Crosscutting;
 using Crosscutting.SellixPayload;
 using DiscordBot.Application.Interface;
-using DiscordSaga.Components.Discord;
+using DiscordSaga.Components.Events;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -147,11 +147,12 @@ namespace DiscordBot.Infrastructure
                     await _db.SaveChangesAsync();
 
                     var serializePayload = JsonConvert.SerializeObject(root);
+                    
                     var message = new LicenseNotificationEvent
                     {
                         Payload = serializePayload,
                         Quantity = quantity,
-                        Time = time,
+                        Time = time.AddDays(Convert.ToInt32(1 * quantity)),
                         WhichSpec = whichSpec,
                     };
 
