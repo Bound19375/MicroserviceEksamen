@@ -1,9 +1,8 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Microsoft.Extensions.Configuration;
 
-namespace Crosscutting.DiscordConnectionHandler
+namespace BoundBot.Connection.DiscordConnectionHandler
 {
     namespace DiscordClientLibrary
     {

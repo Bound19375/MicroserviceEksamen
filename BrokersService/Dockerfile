@@ -19,6 +19,8 @@ COPY ["Crosscutting/Crosscutting.csproj", "Crosscutting/"]
 COPY ["DiscordSaga.Components/DiscordSaga.Components.csproj", "DiscordSaga.Components/"]
 COPY ["DiscordBot.Infrastructure/DiscordBot.Infrastructure.csproj", "DiscordBot.Infrastructure/"]
 COPY ["BoundBot/BoundBot.csproj", "BoundBot/"]
+COPY ["BoundBot.Connection/BoundBot.Connection.csproj", "BoundBot.Connection/"]
+COPY ["DiscordSaga.Consumers/DiscordSaga.Consumers.csproj", "DiscordSaga.Consumers/"]
 COPY ["DiscordSaga/DiscordSaga.csproj", "DiscordSaga/"]
 RUN dotnet restore "BrokersService/BrokersService.csproj"
 COPY . .
@@ -28,12 +30,12 @@ RUN dotnet build "BrokersService.csproj" -c Release -o /app/build
 FROM build AS publish
 RUN dotnet publish "BrokersService.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-FROM base AS finalWin
+FROM win AS finalWin
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "BrokersService.dll"]
 
-FROM base AS finalArm
+FROM arm AS finalArm
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "BrokersService.dll"]

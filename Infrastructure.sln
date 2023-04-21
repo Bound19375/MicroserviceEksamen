@@ -69,7 +69,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HostServices", "HostService
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EFCore", "EFCore\EFCore.csproj", "{9DD52DE5-75B7-4FAD-89D2-948F482F5FEE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordSaga.Consumers", "DiscordSaga.Consumers\DiscordSaga.Consumers.csproj", "{03AB6056-9BF6-42F1-AFA5-F248C3E17FEA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiscordSaga.Consumers", "DiscordSaga.Consumers\DiscordSaga.Consumers.csproj", "{03AB6056-9BF6-42F1-AFA5-F248C3E17FEA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoundBot.Connection", "BoundBot.Connection\BoundBot.Connection.csproj", "{232CDBAA-921B-4F20-A630-E55C1AD123BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -153,6 +155,10 @@ Global
 		{03AB6056-9BF6-42F1-AFA5-F248C3E17FEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03AB6056-9BF6-42F1-AFA5-F248C3E17FEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{03AB6056-9BF6-42F1-AFA5-F248C3E17FEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{232CDBAA-921B-4F20-A630-E55C1AD123BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{232CDBAA-921B-4F20-A630-E55C1AD123BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{232CDBAA-921B-4F20-A630-E55C1AD123BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{232CDBAA-921B-4F20-A630-E55C1AD123BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -183,6 +189,7 @@ Global
 		{D8A50F46-5398-4AB0-9D2C-2D26F729C0D7} = {C58B2774-CBC4-4CC7-AE46-5F1D6D41C4F7}
 		{9DD52DE5-75B7-4FAD-89D2-948F482F5FEE} = {4E7F8963-CCB2-44C1-AF4E-3CB3E30885AA}
 		{03AB6056-9BF6-42F1-AFA5-F248C3E17FEA} = {1E1A6715-591E-484B-A39B-4AD70073F9B8}
+		{232CDBAA-921B-4F20-A630-E55C1AD123BF} = {9413011F-81EC-45E7-B6BD-641ADC1A30F1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CE416F04-8216-4705-B608-C1C8307CA0F1}

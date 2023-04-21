@@ -1,5 +1,5 @@
 ﻿using Auth.Database;
-using Crosscutting.DiscordConnectionHandler.DiscordClientLibrary;
+using BoundBot.Connection.DiscordConnectionHandler.DiscordClientLibrary;
 using Crosscutting.TransactionHandling;
 using Discord;
 using Discord.WebSocket;

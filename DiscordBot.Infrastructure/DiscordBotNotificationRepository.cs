@@ -1,5 +1,5 @@
-﻿using Crosscutting;
-using Crosscutting.DiscordConnectionHandler.DiscordClientLibrary;
+﻿using BoundBot.Connection.DiscordConnectionHandler.DiscordClientLibrary;
+using Crosscutting;
 using Crosscutting.SellixPayload;
 using Discord;
 using Discord.WebSocket;

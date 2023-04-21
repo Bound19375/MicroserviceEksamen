@@ -10,12 +10,16 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:latest AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["HostServices/HostServices.csproj", "HostServices/"]
 COPY ["DiscordBot.Application/DiscordBot.Application.csproj", "DiscordBot.Application/"]
 COPY ["Auth.Database/Auth.Database.csproj", "Auth.Database/"]
 COPY ["Crosscutting/Crosscutting.csproj", "Crosscutting/"]
+COPY ["DiscordSaga.Components/DiscordSaga.Components.csproj", "DiscordSaga.Components/"]
+COPY ["DiscordBot.Infrastructure/DiscordBot.Infrastructure.csproj", "DiscordBot.Infrastructure/"]
+COPY ["BoundBot/BoundBot.csproj", "BoundBot/"]
+COPY ["BoundBot.Connection/BoundBot.Connection.csproj", "BoundBot.Connection/"]
 RUN dotnet restore "HostServices/HostServices.csproj"
 COPY . .
 WORKDIR "/src/HostServices"

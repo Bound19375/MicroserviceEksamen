@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text;
 using Auth.Database;
-using Crosscutting.DiscordConnectionHandler.DiscordClientLibrary;
+using BoundBot.Connection.DiscordConnectionHandler.DiscordClientLibrary;
 using Discord;
 using Discord.WebSocket;
 using DiscordBot.Application.Interface;

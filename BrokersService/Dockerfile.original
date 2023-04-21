@@ -12,7 +12,6 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
-COPY ["API.DiscordBot/API.DiscordBot.csproj", "API.DiscordBot/"]
 COPY ["BrokersService/BrokersService.csproj", "BrokersService/"]
 COPY ["DiscordBot.Application/DiscordBot.Application.csproj", "DiscordBot.Application/"]
 COPY ["Auth.Database/Auth.Database.csproj", "Auth.Database/"]
@@ -20,23 +19,21 @@ COPY ["Crosscutting/Crosscutting.csproj", "Crosscutting/"]
 COPY ["DiscordSaga.Components/DiscordSaga.Components.csproj", "DiscordSaga.Components/"]
 COPY ["DiscordBot.Infrastructure/DiscordBot.Infrastructure.csproj", "DiscordBot.Infrastructure/"]
 COPY ["BoundBot/BoundBot.csproj", "BoundBot/"]
-COPY ["BoundBot.Connection/BoundBot.Connection.csproj", "BoundBot.Connection/"]
-COPY ["DiscordSaga.Consumers/DiscordSaga.Consumers.csproj", "DiscordSaga.Consumers/"]
 COPY ["DiscordSaga/DiscordSaga.csproj", "DiscordSaga/"]
-RUN dotnet restore "API.DiscordBot/API.DiscordBot.csproj"
+RUN dotnet restore "BrokersService/BrokersService.csproj"
 COPY . .
-WORKDIR "/src/API.DiscordBot"
-RUN dotnet build "API.DiscordBot.csproj" -c Release -o /app/build
+WORKDIR "/src/BrokersService"
+RUN dotnet build "BrokersService.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "API.DiscordBot.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "BrokersService.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-FROM win AS finalWin
+FROM base AS finalWin
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "API.DiscordBot.dll"]
+ENTRYPOINT ["dotnet", "BrokersService.dll"]
 
-FROM arm AS finalArm
+FROM base AS finalArm
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "API.DiscordBot.dll"]
+ENTRYPOINT ["dotnet", "BrokersService.dll"]

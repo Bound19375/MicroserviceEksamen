@@ -33,6 +33,7 @@
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BoundBot.Connection\BoundBot.Connection.csproj" />
     <ProjectReference Include="..\Crosscutting\Crosscutting.csproj" />
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,5 @@
-﻿using BoundBot.Services;
-using Crosscutting.DiscordConnectionHandler.DiscordClientLibrary;
+﻿using BoundBot.Connection.DiscordConnectionHandler.DiscordClientLibrary;
+using BoundBot.Services;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;

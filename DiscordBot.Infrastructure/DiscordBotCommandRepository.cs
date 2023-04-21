@@ -1,7 +1,6 @@
 ﻿using Auth.Database;
 using Auth.Database.Model;
 using Crosscutting;
-using Crosscutting.DiscordConnectionHandler.DiscordClientLibrary;
 using Discord;
 using Discord.WebSocket;
 using DiscordBot.Application.Interface;
@@ -9,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Text;
+using BoundBot.Connection.DiscordConnectionHandler.DiscordClientLibrary;
 
 namespace DiscordBot.Infrastructure
 {

@@ -10,7 +10,7 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:latest AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["API.Auth/API.Auth.csproj", "API.Auth/"]
 COPY ["Auth.Application/Auth.Application.csproj", "Auth.Application/"]
@@ -29,6 +29,7 @@ FROM win AS finalWin
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "API.Auth.dll"]
+
 
 FROM arm AS finalArm
 WORKDIR /app
