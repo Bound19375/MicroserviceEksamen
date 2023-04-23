@@ -5,7 +5,7 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/aspnet:7.0.3-bullseye-slim-arm64v8 AS arm
+FROM mcr.microsoft.com/dotnet/aspnet:7.0.5-bullseye-slim-arm64v8 AS arm
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
