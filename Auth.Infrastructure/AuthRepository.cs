@@ -1,4 +1,5 @@
-﻿using Auth.Application.Interface;
+﻿using System.Security.Cryptography.X509Certificates;
+using Auth.Application.Interface;
 using Auth.Database;
 using Crosscutting;
 using Microsoft.EntityFrameworkCore;
@@ -90,7 +91,7 @@ namespace Auth.Infrastructure
 
                 if (returnList.Any())
                 {
-                    return returnList;
+                    return returnList.OrderByDescending(x => x.EndDate).ToList();
                 }
                 else
                 {
