@@ -42,12 +42,12 @@ namespace DiscordBot.Infrastructure
                     {
                         whichSpec = WhichSpec.AIO;
                         quantity = Convert.ToInt32(root.Data.Quantity);
-                        var currentLicenseTime = await _db.ActiveLicenses.Include(user => user.User)
+                        var currentLicenseTime = _db.ActiveLicenses.Include(user => user.User)
                             .Include(order => order.Order)
                             .Where(x => (x.User.DiscordId == root.Data.CustomFields.DiscordId ||
                                          x.User.DiscordUsername == root.Data.CustomFields.DiscordUser) &&
                                         x.ProductNameEnum == WhichSpec.AIO)
-                            .FirstOrDefaultAsync();
+                            .MaxBy(x=>x.EndDate) ?? null;
 
                         if (currentLicenseTime?.EndDate != null)
                         {
@@ -72,11 +72,11 @@ namespace DiscordBot.Infrastructure
 
                         quantity = 30 * Convert.ToInt32(root.Data.Quantity);
 
-                        var currentMonthlyLicenseTime = await _db.ActiveLicenses.Include(user => user.User)
+                        var currentMonthlyLicenseTime = _db.ActiveLicenses.Include(user => user.User)
                             .Where(x => (x.User.DiscordId == root.Data.CustomFields.DiscordId ||
                                          x.User.DiscordUsername == root.Data.CustomFields.DiscordUser) &&
                                         x.ProductNameEnum == whichSpec)
-                            .FirstOrDefaultAsync();
+                            .MaxBy(x=>x.EndDate) ?? null;
 
                         if (currentMonthlyLicenseTime != null)
                         {
