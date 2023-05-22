@@ -10,7 +10,7 @@ public static class DbContextConfiguration
     {
         // Add services to the container.
         //dotnet ef migrations add 0.1 --project Auth.Database --startup-project EFCore --context AuthDbContext
-        //dotnet ef database update --project Auth.Database --startup-project EFCore --context AuthDbContext --connection "server=localhost;port=3306;database=Boundcore.Master;user=user;password=password;AllowPublicKeyRetrieval=True;SslMode=preferred;"
+        //dotnet ef database update --project Auth.Database --startup-project EFCore --context AuthDbContext
         //dotnet tool update --global dotnet-ef
         //$env:ConnectionStrings__BoundcoreMaster='server=localhost;port=3306;database=Boundcore.Master;user=user;password=password;AllowPublicKeyRetrieval=True;SslMode=preferred;'
 

@@ -47,13 +47,13 @@ public class LicenseStateMachine : MassTransitStateMachine<LicenseState>
                 })
                 .Produce(context => context.Init<LicenseNotificationEvent>(new
                 {
-                    context.Saga
+                    //context.Saga
 
-                    //context.Saga.CorrelationId,
-                    //context.Saga.Payload,
-                    //context.Saga.Quantity,
-                    //context.Saga.Time,
-                    //context.Saga.WhichSpec
+                    context.Saga.CorrelationId,
+                    context.Saga.Payload,
+                    context.Saga.Quantity,
+                    context.Saga.Time,
+                    context.Saga.WhichSpec
                 }))
                 .TransitionTo(NotificationReady));
 

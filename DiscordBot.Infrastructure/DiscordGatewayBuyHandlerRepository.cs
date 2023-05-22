@@ -6,6 +6,7 @@ using DiscordBot.Application.Interface;
 using DiscordSaga.Components.Events;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 
 namespace DiscordBot.Infrastructure
@@ -42,24 +43,24 @@ namespace DiscordBot.Infrastructure
                     {
                         whichSpec = WhichSpec.AIO;
                         quantity = Convert.ToInt32(root.Data.Quantity);
-                        var currentLicenseTime = _db.ActiveLicenses.Include(user => user.User)
+                        var currentLicenseTime = await _db.ActiveLicenses.Include(user => user.User)
                             .Include(order => order.Order)
                             .Where(x => (x.User.DiscordId == root.Data.CustomFields.DiscordId ||
                                          x.User.DiscordUsername == root.Data.CustomFields.DiscordUser) &&
-                                        x.ProductNameEnum == WhichSpec.AIO)
-                            .MaxBy(x=>x.EndDate) ?? null;
+                                        x.ProductNameEnum == WhichSpec.AIO).ToListAsync() ?? null;
 
-                        if (currentLicenseTime?.EndDate != null)
+                        if (!currentLicenseTime.IsNullOrEmpty())
                         {
-                            if (currentLicenseTime.EndDate >= DateTime.UtcNow)
+                            var maxCurrentLicenseTime = currentLicenseTime.MaxBy(x => x.EndDate);
+
+                            if (maxCurrentLicenseTime?.EndDate >= DateTime.UtcNow)
                             {
-                                time = currentLicenseTime.EndDate;
+                                time = currentLicenseTime.MaxBy(x => x.EndDate)!.EndDate;
                             }
-                            else
-                            {
-                                _db.ActiveLicenses.Remove(currentLicenseTime);
-                                await _db.SaveChangesAsync();
-                            }
+                            
+                            _db.ActiveLicenses.RemoveRange(currentLicenseTime);
+                            await _db.SaveChangesAsync();
+                            
                         }
                     }
                     else
@@ -72,23 +73,23 @@ namespace DiscordBot.Infrastructure
 
                         quantity = 30 * Convert.ToInt32(root.Data.Quantity);
 
-                        var currentMonthlyLicenseTime = _db.ActiveLicenses.Include(user => user.User)
+                        var currentMonthlyLicenseTime = await _db.ActiveLicenses.Include(user => user.User)
                             .Where(x => (x.User.DiscordId == root.Data.CustomFields.DiscordId ||
                                          x.User.DiscordUsername == root.Data.CustomFields.DiscordUser) &&
-                                        x.ProductNameEnum == whichSpec)
-                            .MaxBy(x=>x.EndDate) ?? null;
+                                        x.ProductNameEnum == whichSpec).ToListAsync() ?? null;
 
-                        if (currentMonthlyLicenseTime != null)
+                        if (!currentMonthlyLicenseTime.IsNullOrEmpty())
                         {
-                            if (currentMonthlyLicenseTime.EndDate >= DateTime.UtcNow)
+                            var maxCurrentMonthlyLicenseTime = currentMonthlyLicenseTime.MaxBy(x => x.EndDate);
+
+                            if (maxCurrentMonthlyLicenseTime?.EndDate >= DateTime.UtcNow)
                             {
-                                time = currentMonthlyLicenseTime.EndDate;
+                                time = maxCurrentMonthlyLicenseTime.EndDate;
                             }
-                            else
-                            {
-                                _db.ActiveLicenses.Remove(currentMonthlyLicenseTime);
-                                await _db.SaveChangesAsync();
-                            }
+                            
+                            _db.ActiveLicenses.RemoveRange(currentMonthlyLicenseTime);
+                            await _db.SaveChangesAsync();
+                            
                         }
                     }
 
