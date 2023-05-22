@@ -59,12 +59,10 @@ namespace DiscordBot.Infrastructure
                                 {
                                     time = currentLicenseTime.MaxBy(x => x.EndDate)!.EndDate;
                                 }
-                            }
 
-                            if (currentLicenseTime != null) 
                                 _db.ActiveLicenses.RemoveRange(currentLicenseTime);
-                            await _db.SaveChangesAsync();
-                            
+                                await _db.SaveChangesAsync();
+                            }
                         }
                     }
                     else
@@ -92,12 +90,10 @@ namespace DiscordBot.Infrastructure
                                 {
                                     time = maxCurrentMonthlyLicenseTime.EndDate;
                                 }
-                            }
 
-                            if (currentMonthlyLicenseTime != null)
                                 _db.ActiveLicenses.RemoveRange(currentMonthlyLicenseTime);
-                            await _db.SaveChangesAsync();
-                            
+                                await _db.SaveChangesAsync();
+                            }
                         }
                     }
 
