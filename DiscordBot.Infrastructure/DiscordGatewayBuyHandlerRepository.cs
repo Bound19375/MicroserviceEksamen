@@ -51,14 +51,18 @@ namespace DiscordBot.Infrastructure
 
                         if (!currentLicenseTime.IsNullOrEmpty())
                         {
-                            var maxCurrentLicenseTime = currentLicenseTime.MaxBy(x => x.EndDate);
-
-                            if (maxCurrentLicenseTime?.EndDate >= DateTime.UtcNow)
+                            if (currentLicenseTime != null)
                             {
-                                time = currentLicenseTime.MaxBy(x => x.EndDate)!.EndDate;
+                                var maxCurrentLicenseTime = currentLicenseTime.MaxBy(x => x.EndDate);
+
+                                if (maxCurrentLicenseTime?.EndDate >= DateTime.UtcNow)
+                                {
+                                    time = currentLicenseTime.MaxBy(x => x.EndDate)!.EndDate;
+                                }
                             }
-                            
-                            _db.ActiveLicenses.RemoveRange(currentLicenseTime);
+
+                            if (currentLicenseTime != null) 
+                                _db.ActiveLicenses.RemoveRange(currentLicenseTime);
                             await _db.SaveChangesAsync();
                             
                         }
@@ -80,14 +84,18 @@ namespace DiscordBot.Infrastructure
 
                         if (!currentMonthlyLicenseTime.IsNullOrEmpty())
                         {
-                            var maxCurrentMonthlyLicenseTime = currentMonthlyLicenseTime.MaxBy(x => x.EndDate);
-
-                            if (maxCurrentMonthlyLicenseTime?.EndDate >= DateTime.UtcNow)
+                            if (currentMonthlyLicenseTime != null)
                             {
-                                time = maxCurrentMonthlyLicenseTime.EndDate;
+                                var maxCurrentMonthlyLicenseTime = currentMonthlyLicenseTime.MaxBy(x => x.EndDate);
+
+                                if (maxCurrentMonthlyLicenseTime?.EndDate >= DateTime.UtcNow)
+                                {
+                                    time = maxCurrentMonthlyLicenseTime.EndDate;
+                                }
                             }
-                            
-                            _db.ActiveLicenses.RemoveRange(currentMonthlyLicenseTime);
+
+                            if (currentMonthlyLicenseTime != null)
+                                _db.ActiveLicenses.RemoveRange(currentMonthlyLicenseTime);
                             await _db.SaveChangesAsync();
                             
                         }
