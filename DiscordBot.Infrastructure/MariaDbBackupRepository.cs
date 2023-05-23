@@ -24,7 +24,7 @@ public class MariaDbBackupRepository : IMariaDbBackupRepository
         _logger = logger;
     }
 
-    public async Task Backup()
+    async Task IMariaDbBackupRepository.Backup()
     {
         try
         {

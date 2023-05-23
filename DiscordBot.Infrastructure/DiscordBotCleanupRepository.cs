@@ -25,7 +25,7 @@ public class DiscordBotCleanupRepository : IDiscordBotCleanupRepository
         _unitOfWork = unitOfWork;
     }
 
-    public async Task CleanUp()
+    async Task IDiscordBotCleanupRepository.CleanUp()
     {
         try
         {

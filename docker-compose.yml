@@ -83,6 +83,22 @@ services:
       context: .
       dockerfile: API.DiscordBot/Dockerfile
 
+  api.admin:
+    image: ${DOCKER_REGISTRY-}apiadmin
+    #platform: linux/arm64/v8
+    networks: 
+      - private_network
+    hostname: api.admin.oerumtechnologies.com
+    environment:
+      - ConnectionStrings__BoundcoreMaster=${ConnectionStrings__BoundcoreMaster}
+      - JWT__ValidIssuer=${JWTValidUssuer}
+      - JWT__ValidAudience${JWTValidAudience}
+      - JWT__SecretKey=${JWTSecretKey}
+    restart: always
+    build:
+      context: .
+      dockerfile: API.Admin/Dockerfile
+
   HostServices:
     image: ${DOCKER_REGISTRY-}hostservices
     #platform: linux/arm64/v8
