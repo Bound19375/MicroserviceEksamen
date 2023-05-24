@@ -17,9 +17,9 @@ namespace API.Auth.Controllers
             _configuration = configuration;
         }
 
-        [HttpPost("Authenticate")]
-        [Authorize(Roles = "User")]
+        [Authorize(Policy = "user")]
         [Authorize(Policy = "hwid")]
+        [HttpPost("Authenticate")]
         public async Task<IActionResult> Auth([FromBody] AuthModelDTO model)
         {
             try

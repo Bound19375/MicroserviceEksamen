@@ -36,7 +36,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddJwtConfiguration(builder.Configuration);
 
 //Policies
-builder.Services.AddPolicyConfiguration();
+builder.Services.AddClaimPolicyConfiguration();
 
 var app = builder.Build();
 

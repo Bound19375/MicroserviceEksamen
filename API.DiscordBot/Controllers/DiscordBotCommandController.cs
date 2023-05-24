@@ -14,9 +14,8 @@ namespace API.DiscordBot.Controllers
             _discord = discord;
         }
 
-        [HttpPost("Authenticate")]
-        [Authorize(Roles = "admin")]
-        [Authorize(Roles = "staff")]
+        [Authorize(Policy = "admin")]
+        [Authorize(Policy = "staff")]
         [HttpPost("StaffLicense")]
         public async Task<IActionResult> StaffLicense([FromBody] DiscordModelDto model)
         {
@@ -31,8 +30,7 @@ namespace API.DiscordBot.Controllers
             }
         }
 
-        [HttpPost("Authenticate")]
-        [Authorize(Roles = "User")]
+        [Authorize(Policy = "user")]
         [HttpPut("UpdateDiscord")]
         public async Task<IActionResult> UpdateDiscordAndRole([FromBody] DiscordModelDto model)
         {
@@ -47,8 +45,7 @@ namespace API.DiscordBot.Controllers
             }
         }
 
-        [HttpPost("Authenticate")]
-        [Authorize(Roles = "User")]
+        [Authorize(Policy = "user")]
         [HttpPut("UpdateHwid")]
         public async Task<IActionResult> UpdateHWID([FromBody] DiscordModelDto model)
         {

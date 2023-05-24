@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Admin.Controllers
 {
 
-    [Route("API/DiscordBot/")]
+    [Route("/API/BoundCore/Admin/")]
     public class JsonWebTokensController : Controller
     {
         private readonly IConfiguration _configuration;
@@ -17,23 +17,38 @@ namespace API.Admin.Controllers
             _configuration = configuration;
         }
 
+        public class APIJWTModel
+        {
+            public string? RefreshToken { get; set; }
+            public string? Password { get; set; }
+        }
+
         [HttpPost("JwtRefreshAndGenerate")]
         [AllowAnonymous]
-        public async Task<IActionResult> Generate([FromBody] JsonObject model)
+        public async Task<IActionResult> Generate([FromBody] APIJWTModel model)
         {
-            const string adminRoleId = "860603777790771211";
-            const string staffRoleId = "860628656259203092";
-
-            var claims = new List<Claim>
+            try
             {
-                new("role", "User"),
-                new("role", "Admin")
-            };
+                if (model.Password != null)
+                {
+                    var claims = new List<Claim>
+                    {
+                        new("user", "user"),
+                        new("admin", "admin")
+                    };
 
+                    var jwt = await JwtApiResponse.JwtRefreshAndGenerate(claims, _configuration, model.RefreshToken!, null!);
 
-            var jwt = await JwtApiResponse.JwtRefreshAndGenerate(claims, _configuration, model[0]?.ToString() ?? string.Empty, null!);
+                    return await Task.FromResult(Ok(jwt));
+                }
 
-            return await Task.FromResult(Ok(jwt));
+                return BadRequest("Unsuccessful Admin JWT Generation");
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
     }
 }

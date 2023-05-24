@@ -41,7 +41,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddJwtConfiguration(builder.Configuration);
 
 //Policies
-builder.Services.AddPolicyConfiguration();
+builder.Services.AddClaimPolicyConfiguration();
 
 //Kafka
 builder.Services.AddMassTransitWithRabbitMqAndKafka(builder.Configuration);

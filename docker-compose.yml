@@ -29,7 +29,7 @@ services:
     environment:
       - ConnectionStrings__BoundcoreMaster=${ConnectionStrings__BoundcoreMaster}
       - JWT__ValidIssuer=${JWTValidUssuer}
-      - JWT__ValidAudience${JWTValidAudience}
+      - JWT__ValidAudience=${JWTValidAudience}
       - JWT__SecretKey=${JWTSecretKey}
       - RabbitMQ__User=${RabbitMQUser} 
       - RabbitMQ__Pass=${rabbitmqpass}
@@ -50,7 +50,7 @@ services:
     environment:
       - ConnectionStrings__BoundcoreMaster=${ConnectionStrings__BoundcoreMaster}
       - JWT__ValidIssuer=${JWTValidUssuer}
-      - JWT__ValidAudience${JWTValidAudience}
+      - JWT__ValidAudience=${JWTValidAudience}
       - JWT__SecretKey=${JWTSecretKey}
       - RabbitMQ__User=${rabbitmquser} 
       - RabbitMQ__Pass=${rabbitmqpass}
@@ -70,7 +70,7 @@ services:
     environment:
       - ConnectionStrings__BoundcoreMaster=${ConnectionStrings__BoundcoreMaster}
       - JWT__ValidIssuer=${JWTValidUssuer}
-      - JWT__ValidAudience${JWTValidAudience}
+      - JWT__ValidAudience=${JWTValidAudience}
       - JWT__SecretKey=${JWTSecretKey}
       - RabbitMQ__User=${RabbitMQUser}
       - RabbitMQ__Pass=${RabbitMQPass}
@@ -92,7 +92,7 @@ services:
     environment:
       - ConnectionStrings__BoundcoreMaster=${ConnectionStrings__BoundcoreMaster}
       - JWT__ValidIssuer=${JWTValidUssuer}
-      - JWT__ValidAudience${JWTValidAudience}
+      - JWT__ValidAudience=${JWTValidAudience}
       - JWT__SecretKey=${JWTSecretKey}
     restart: always
     build:

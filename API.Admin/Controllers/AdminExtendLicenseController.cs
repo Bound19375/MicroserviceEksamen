@@ -21,8 +21,8 @@ namespace API.Admin.Controllers
             public string? DiscordId { get; set; }
         }
 
-        [HttpPost("ExtendLicense")]
         [Authorize(Policy = "admin")]
+        [HttpPost("ExtendLicense")]
         public async Task<IActionResult> ExtendLicense([FromBody] ExtendLicenseModel model)
         {
             try

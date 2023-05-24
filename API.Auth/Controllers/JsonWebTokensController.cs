@@ -24,15 +24,22 @@ namespace API.Auth.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Generate([FromBody] JwtModel body)
         {
-            var claims = new List<Claim>
+            try
             {
+                var claims = new List<Claim>
+                {
                 new Claim("hwid", body.Hwid!),
-                new Claim("role", "User"),
-            };
+                new Claim("user", "user"),
+                };
 
-            var jwt = await JwtApiResponse.JwtRefreshAndGenerate(claims, _configuration, body.RefreshToken, null!);
+                var jwt = await JwtApiResponse.JwtRefreshAndGenerate(claims, _configuration, body.RefreshToken, null!);
 
-            return await Task.FromResult(Ok(jwt));
+                return await Task.FromResult(Ok(jwt));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Unsuccessful Auth JWT Generation: " + ex.Message);
+            }
         }
     }
 }
