@@ -3,6 +3,7 @@ using Quartz;
 
 namespace HostServices.HostService
 {
+    [DisallowConcurrentExecution]
     public class MariaDbBackup : IJob
     {
         private readonly IMariaDbBackupImplementation _implementation;
